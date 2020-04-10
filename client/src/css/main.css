@@ -1,0 +1,18 @@
+.button {
+  color: rgb(85, 79, 79);
+  border-radius: 3px;
+  border: solid rgb(194, 190, 190) 2;
+  cursor: pointer;
+}
+
+.input {
+  border-radius: 10%;
+}
+
+.flex {
+  display: flex;
+}
+
+.border-bottom {
+  border-bottom: solid 1px;
+}

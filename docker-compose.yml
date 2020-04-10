@@ -1,0 +1,38 @@
+version: '3.1'
+services:
+  client:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile_client
+    command: bash -c "yarn  && yarn start"
+    working_dir: /app
+    tty: true
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
+    ports:
+      - 3000:3000
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+  server:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile_server
+    command: bash -c "npm install && adonis serve --dev"
+    working_dir: /app
+    environment:
+      - HOST=0.0.0.0
+    restart: always
+    ports:
+      - 3333:3333
+    volumes:
+      - ./api-server:/app
+      - /app/node_modules
+
+  redis:
+    image: 'redis:5.0'
+    ports:
+      - '6379:6379'
+    volumes:
+      - './db:/data'
