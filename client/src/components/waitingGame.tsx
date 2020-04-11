@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/main.css';
 import '../css/waitingGame.scss';
@@ -10,6 +10,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -97,7 +98,7 @@ const WaitingPlayer = () => {
     <div className='waiting-box'>
       <div>PLAYER</div>
       {state.socket.onlineUsers.map((user: any, key: number) => (
-        <OnlineUser name={user.name} key={key} />
+        <OnlineUser name={user.name} key={key} userState={user.type} />
       ))}
     </div>
   );
@@ -105,13 +106,41 @@ const WaitingPlayer = () => {
 
 interface propsOnlinceUser {
   name: string;
+  userState: string;
 }
 
-const OnlineUser = ({ name }: propsOnlinceUser) => {
+const OnlineUser = ({ name, userState }: propsOnlinceUser) => {
+  const initlalState = {
+    word: 'オンライン',
+  };
+
+  const [buttonState, setbutton] = useState(initlalState);
+
+  useEffect(() => {
+    switch (userState) {
+      case 'nomal':
+        setbutton({ word: 'オンライン' });
+        break;
+      case 'playing':
+        setbutton({ word: 'プレイ中' });
+        break;
+      case 'waiting':
+        setbutton({ word: 'マッチ待機中' });
+        break;
+      default:
+        break;
+    }
+  }, [userState]);
+
   return (
     <div className='flex border-bottom onLineUser'>
       <div>{name}</div>
-      <div className='button'>対戦を申し込む</div>
+      <div className='flex flex-word'>
+        <Typography color='primary'>
+          {buttonState.word}
+          <Button color='default'>対戦を申し込む</Button>
+        </Typography>
+      </div>
     </div>
   );
 };

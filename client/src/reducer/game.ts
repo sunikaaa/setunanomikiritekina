@@ -6,9 +6,11 @@ export interface GameActionType {
 }
 
 export interface GameStateType {
+  loggedIn: boolean;
   isGame: boolean;
 }
 const initialState: GameStateType = {
+  loggedIn: false,
   isGame: false,
 };
 export const GameReducer = (
@@ -17,9 +19,9 @@ export const GameReducer = (
 ): any => {
   switch (action.type) {
     case gameStart:
-      return { ...state, isGame: true };
+      return { ...state, loggedIn: true };
     case gameFinish:
-      return { isGame: false };
+      return { loggedIn: false };
     default:
       return state;
   }

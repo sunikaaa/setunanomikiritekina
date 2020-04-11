@@ -7,7 +7,7 @@ import WaitingGame from './components/waitingGame';
 
 const App = () => {
   const { state } = useContext(NameContext);
-  return <div>{state.game.isGame ? <WaitingGame /> : <BeforeGame />}</div>;
+  return <div>{state.game.loggedIn ? <WaitingGame /> : <BeforeGame />}</div>;
 };
 
 export default App;

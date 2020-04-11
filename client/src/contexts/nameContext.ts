@@ -15,6 +15,7 @@ export interface State {
 
 export const NameInitialState: State = {
   game: {
+    loggedIn: false,
     isGame: false,
   },
   user: {
