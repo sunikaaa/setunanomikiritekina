@@ -9,28 +9,34 @@ class User extends EventEmitter {
 
   startInterval() {
     setInterval(() => {
+      console.log(this.users);
       const waitUser = this.users.filter((user) => user.type === "waiting");
-      console.log(waitUser);
-      waitUser.length > 1 ? this.pareCreate(waitUser) : "";
-    }, 2000);
+      waitUser.length > 1 && this.pareCreate(waitUser);
+    }, 5000);
   }
 
   pareCreate(waitUser) {
     const length = waitUser.length;
-    let random = Math.floor(Math.random() * length) - 1;
-    this._option.push(waitUser.splice(random, 1));
-    if (length - 1 > 1) {
-      this._option.length % 2 === 0
-        ? this.emitEvent()
+    this._option.push(waitUser.shift());
+    if (length > 0) {
+      console.log(this._option.length, waitUser, "this is option");
+      this._option.length === 2
+        ? this.emitEvent(waitUser)
         : this.pareCreate(waitUser);
     }
   }
 
-  emitEvent() {
+  emitEvent(waitUser) {
+    console.log(waitUser, "emitEvent");
     this._option.forEach((user) => {
       user = this.update(user.socketId, "playing");
     });
     this.emit("match", this._option);
+    console.log("option set");
+    this._option = [];
+    if (waitUser.length > 0) {
+      this.pareCreate(waitUser);
+    }
   }
   onMatching(fn) {
     this.on("match", (pareUser) => {
@@ -39,7 +45,7 @@ class User extends EventEmitter {
   }
 
   removeMatchingListener() {
-    this.removeListener("match");
+    this.removeListener("match", () => {});
   }
 
   add(name, socketId, type) {

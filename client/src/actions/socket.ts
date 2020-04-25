@@ -4,3 +4,4 @@ export const NowonlineUser: string = 'NowonlineUser';
 export const AddonlineUser: string = 'AddonlineUser';
 export const updateUser: string = 'updateUser';
 export const matchUser: string = 'matchUser';
+export const removePare: string = 'updatePareState';

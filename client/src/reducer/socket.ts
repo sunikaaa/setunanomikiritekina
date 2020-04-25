@@ -4,7 +4,6 @@ import {
   AddonlineUser,
   NowonlineUser,
   updateUser,
-  matchUser,
 } from '../actions/socket';
 import _ from 'lodash';
 // tslint:disable-next-line:no-var-requires
@@ -14,7 +13,7 @@ const equal = (pre: any, cu: any, obj?: string) => {
   }
   return pre === cu;
 };
-const equalId = _.curryRight(equal)('socketId');
+const equalId = _.partial(equal, _, _, 'socketId');
 
 export interface ScoketActionType {
   type: string;
@@ -48,26 +47,20 @@ export const SocketReducer = (
       return { ...state, isConnected: false };
 
     case AddonlineUser:
-      console.log(state);
       return {
         ...state,
         onlineUsers: [...state.onlineUsers, ...action.payload],
       };
 
     case NowonlineUser:
-      console.log(state, action.payload);
       return { ...state, onlineUsers: action.payload };
 
     case updateUser:
-      console.log(action.payload);
       const updateUsers = state.onlineUsers.map((oldUser) => {
-        return action.payload.some(equalId(oldUser))
-          ? action.payload.find(equalId(oldUser))
-          : oldUser;
+        return action.payload.find((user) => equalId(oldUser, user)) || oldUser;
       });
       return { ...state, onlineUsers: updateUsers };
 
-    case matchUser:
     default:
       return state;
   }

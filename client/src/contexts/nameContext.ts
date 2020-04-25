@@ -16,10 +16,12 @@ export interface State {
 export const NameInitialState: State = {
   game: {
     loggedIn: false,
-    isGame: false,
+    gameState: 'home',
+    pareState: [],
   },
   user: {
     name: '',
+    socketId: '',
   },
   socket: {
     isConnected: false,
