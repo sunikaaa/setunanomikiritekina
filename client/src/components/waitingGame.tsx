@@ -1,17 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/loading.scss';
 import '../css/main.css';
 import _ from 'lodash';
 import { gameStateChange } from '../actions';
-import { wsToHome } from '../plugins/socket';
+import { wsToHome, wsUser } from '../plugins/socket';
 const WaitingPare = () => {
-  const { state, dispatch } = useContext(NameContext);
-
-  const returnHome = () => {
-    wsToHome(state.game.pareState);
-    dispatch({ type: gameStateChange, payload: 'home' });
-  };
+  useEffect(() => {
+    wsUser.emit('serchPare');
+  }, []);
   return (
     <div>
       <div className='flex center'>
@@ -20,7 +17,6 @@ const WaitingPare = () => {
           対戦相手を待っています......
         </div>
       </div>
-      <button onClick={returnHome}>戻る</button>
     </div>
   );
 };
@@ -34,13 +30,28 @@ const WaitingCanvas = () => {
 };
 
 const WaitingGame = () => {
-  const { state } = useContext(NameContext);
-  return <>{_.isEmpty(state.game.pareState) ? <WaitingPare /> : <SeePare />}</>;
+  const { state, dispatch } = useContext(NameContext);
+  const returnHome = () => {
+    wsToHome(state.game.pareState);
+    dispatch({ type: gameStateChange, payload: 'home' });
+  };
+  return (
+    <>
+      {_.isEmpty(state.game.pareState) ? <WaitingPare /> : <SeePare />}
+      <div>
+        <button onClick={returnHome}>戻る</button>
+      </div>
+    </>
+  );
 };
 
 const SeePare = () => {
   const { state } = useContext(NameContext);
-  console.log(state.user.name);
+
+  const complete = () => {
+    wsUser.emit('readyGO', state.game.room);
+  };
+
   return (
     <>
       <div className='flex around'>
@@ -50,11 +61,13 @@ const SeePare = () => {
         </div>
         <div className='flex column'>
           <div>あいて</div>
-          <div>{state.game.pareState.map((user) => user.name)}</div>
+          {state.game.pareState.map((user, index) => (
+            <div key={index}>{user.name}</div>
+          ))}
         </div>
       </div>
       <div className='flex center'>
-        <button>準備完了</button>
+        <button onClick={complete}>準備完了</button>
       </div>
     </>
   );

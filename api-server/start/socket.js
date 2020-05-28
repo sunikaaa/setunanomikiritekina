@@ -16,9 +16,6 @@ const Ws = use("Ws");
 
 Ws.channel("user", "UserController");
 // Ws.channel("user", ({ socket }) => {
-//   socket.on("error", () => {
-//     console.log("error occer");
-//   });
-//   socket.emit("test", socket.id);
-//   console.log("user joined with %s socket id", socket.id);
+//   console.log(socket.connection);
+//   socket.on("close", () => {});
 // });

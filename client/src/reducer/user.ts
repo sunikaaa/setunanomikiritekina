@@ -1,5 +1,5 @@
 import { setUserName } from '../actions';
-import { connect } from '../actions/socket';
+import { connectUser } from '../actions/socket';
 export interface UserActionType {
   type: string;
   payload: string;
@@ -21,7 +21,7 @@ export const UserReducer = (
   switch (action.type) {
     case setUserName:
       return { ...state, name: action.payload };
-    case connect:
+    case connectUser:
       return { ...state, socketId: action.payload };
     default:
       return state;

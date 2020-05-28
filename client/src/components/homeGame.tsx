@@ -2,8 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/main.css';
 import '../css/homeGame.scss';
-import { wsUser } from '../plugins/socket';
-import { gameStateChange } from '../actions';
+import { gameStateChange, toHomeSetPure } from '../actions';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -30,11 +29,16 @@ const useStyles = makeStyles((theme: Theme) => ({
 const HomeGame = () => {
   const classes = useStyles();
   const [value, setValue] = useState(0);
-
+  const { dispatch } = useContext(NameContext);
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     console.log(newValue);
     setValue(newValue);
   };
+  useEffect(() => {
+                    dispatch({ type: toHomeSetPure });
+                    console.log('this is effect');
+                    // eslint-disable-next-line react-hooks/exhaustive-deps
+                  }, []);
 
   return (
     <div className={classes.root}>
@@ -126,7 +130,6 @@ const OnlineUser = ({ name, userState }: propsOnlinceUser) => {
 const RandomMatch = () => {
   const { dispatch } = useContext(NameContext);
   const SerchPare = () => {
-    wsUser.emit('serchPare');
     dispatch({
       type: gameStateChange,
       payload: 'waiting',

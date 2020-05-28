@@ -20,6 +20,8 @@
     "@types/react-redux": "^7.1.7",
     "@types/react-swipeable-views": "^0.13.0",
     "@types/react-transition-group": "^4.2.4",
+    "@types/socket.io": "^2.1.4",
+    "@types/socket.io-client": "^1.4.32",
     "axios": "^0.19.2",
     "lodash": "^4.17.15",
     "pixi.js": "^5.2.3",
@@ -30,7 +32,9 @@
     "react-swipeable-views": "^0.13.9",
     "react-transition-group": "^4.3.0",
     "redux": "^4.0.5",
-    "typescript": "~3.7.2"
+    "socket.io-client": "^2.3.0",
+    "typescript": "~3.7.2",
+    "uid": "^1.0.0"
   },
   "scripts": {
     "start": "react-scripts start",

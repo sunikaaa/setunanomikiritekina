@@ -6,20 +6,12 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { NameContext, NameInitialState } from './contexts/nameContext';
 import { WrapwsUser } from './plugins/socket';
-// import axios from 'axios';
-// axios
-//   .post('/')
-//   .then((v) => {
-//     console.log(v);
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
 
 const MyApp: React.FC = ({ children }): any => {
   const [state, dispatch] = useReducer(reducer, NameInitialState);
   useEffect(() => {
-    WrapwsUser(dispatch);
+    WrapwsUser({ state, dispatch });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <NameContext.Provider value={{ state, dispatch }}>

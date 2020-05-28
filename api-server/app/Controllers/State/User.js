@@ -1,4 +1,5 @@
 const EventEmitter = require("events");
+const Ws = use("Ws");
 
 class User extends EventEmitter {
   constructor() {
@@ -9,7 +10,6 @@ class User extends EventEmitter {
 
   startInterval() {
     setInterval(() => {
-      console.log(this.users);
       const waitUser = this.users.filter((user) => user.type === "waiting");
       waitUser.length > 1 && this.pareCreate(waitUser);
     }, 5000);
@@ -57,10 +57,12 @@ class User extends EventEmitter {
     this.users.push(send);
     return [send];
   }
-  remove(socketId) {
-    this.users = this.users.filter((user) => user.socketId !== socketId);
+
+  async remove(socketId) {
+    this.users = await this.users.filter((user) => user.socketId !== socketId);
     return this.users;
   }
+
   update(socketId, type) {
     const userIndex = this.users.findIndex(
       (user) => socketId === user.socketId

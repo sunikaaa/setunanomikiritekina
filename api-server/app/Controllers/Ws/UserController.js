@@ -2,34 +2,29 @@
 const userState = require("../State/User");
 const waiting = "waiting";
 const nomal = "nomal";
-console.log(userState, "this is State");
+const Ws = use("Ws");
+
 class UserController {
   constructor({ socket, request }) {
     this.socket = socket;
     this.request = request;
-
     this.socket.emit("connect", this.socket.id);
   }
 
   onSetname(name) {
-    console.log(name, "this log");
     const user = userState.add(name, this.socket.id, nomal);
     this.socket.emit("NowonlineUser", userState.users);
     this.socket.broadcast("AddonlineUser", user);
   }
 
-  onToHome(gameUsers) {
+  onToHome() {
     const user = userState.update(this.socket.id, "nomal");
     this.updateEmit(user);
-    gameUsers.forEach((gameUser) => {
-      this.socket.emitTo("updatePareState", user, gameUser.socketId);
-    });
   }
 
-  onClose() {
-    const newState = userState.remove(this.socket.id);
-    console.log(newState, "this is new State");
-    this.updateEmit(newState);
+  async onClose() {
+    const newState = await userState.remove(this.socket.id);
+    // this.updateEmit(newState);
   }
   //@pareUser :{}
   //
@@ -51,6 +46,7 @@ class UserController {
     });
   }
   updateEmit(state) {
+    console.log("state", state);
     this.socket.broadcastToAll("updateUser", state);
   }
   onError() {

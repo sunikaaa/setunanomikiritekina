@@ -27,3 +27,8 @@
 .around {
   justify-content: space-around;
 }
+
+.whFull {
+  width: 100vw;
+  height: 100vh;
+}

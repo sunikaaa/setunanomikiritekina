@@ -1,8 +1,25 @@
-import { gameStart, gameFinish, gameStateChange } from '../actions';
-import { matchUser, removePare } from '../actions/socket';
+import {
+  gameStart,
+  gameFinish,
+  gameStateChange,
+  toHomeSetPure,
+} from '../actions';
+import { matchUser, removePare, setRoom, startGame } from '../actions/socket';
 export interface GameActionType {
   type: string;
   payload: any;
+}
+export interface onlineUser {
+  name: string;
+  socketId: string;
+  type: string;
+}
+
+export interface mySocketState extends onlineUser {
+  game: {
+    room: string;
+    ready: false;
+  };
 }
 
 interface PareState {
@@ -12,13 +29,20 @@ interface PareState {
 
 export interface GameStateType {
   loggedIn: boolean;
-  gameState: string;
+  userState: string;
   pareState: PareState[];
+  room: string;
+  time: number;
+  fire: boolean;
+  SocketState?: mySocketState;
 }
 const initialState: GameStateType = {
   loggedIn: false,
-  gameState: 'home',
+  userState: 'home',
   pareState: [],
+  room: '',
+  fire: false,
+  time: 10000000000000,
 };
 export const GameReducer = (
   state = initialState,
@@ -30,7 +54,7 @@ export const GameReducer = (
     case gameFinish:
       return { ...state, loggedIn: false };
     case gameStateChange:
-      return { ...state, gameState: action.payload };
+      return { ...state, userState: action.payload };
     case matchUser:
       return { ...state, pareState: action.payload };
     case removePare:
@@ -39,7 +63,16 @@ export const GameReducer = (
           (removeUser: PareState) => user.socketId !== removeUser.socketId
         );
       });
+      console.log(pare);
       return { ...state, pareState: pare };
+    case 'Fire':
+      return { ...state, fire: true };
+    case toHomeSetPure:
+      return { ...initialState, loggedIn: true };
+    case setRoom:
+      return { ...state, room: action.payload };
+    case startGame:
+      return { ...state, userState: 'playing', time: action.payload };
     default:
       return state;
   }
