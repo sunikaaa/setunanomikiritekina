@@ -1,6 +1,10 @@
-export const connect: string = 'connect';
-export const disConnect: string = 'disConnect';
-export const NowonlineUser: string = 'NowonlineUser';
-export const AddonlineUser: string = 'AddonlineUser';
-export const updateUser: string = 'updateUser';
-export const matchUser: string = 'matchUser';
+export const connectUser = 'connectUser';
+export const disConnect = 'disConnect';
+export const NowonlineUser = 'NowonlineUser';
+export const AddonlineUser = 'AddonlineUser';
+export const updateUser = 'updateUser';
+export const matchUser = 'matchUser';
+export const removePare = 'updatePareState';
+export const removeUser = 'removeUser';
+export const setRoom = 'setRoom';
+export const startGame = 'startGame';

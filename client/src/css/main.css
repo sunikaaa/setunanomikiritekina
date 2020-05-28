@@ -16,3 +16,19 @@
 .border-bottom {
   border-bottom: solid 1px;
 }
+
+.center {
+  justify-content: center;
+}
+.column {
+  flex-direction: column;
+}
+
+.around {
+  justify-content: space-around;
+}
+
+.whFull {
+  width: 100vw;
+  height: 100vh;
+}

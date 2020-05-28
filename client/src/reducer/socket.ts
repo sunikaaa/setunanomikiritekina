@@ -1,10 +1,10 @@
 import {
-  connect,
+  connectUser,
   disConnect,
   AddonlineUser,
   NowonlineUser,
   updateUser,
-  matchUser,
+  removeUser,
 } from '../actions/socket';
 import _ from 'lodash';
 // tslint:disable-next-line:no-var-requires
@@ -14,22 +14,30 @@ const equal = (pre: any, cu: any, obj?: string) => {
   }
   return pre === cu;
 };
-const equalId = _.curryRight(equal)('socketId');
+const equalId = _.partial(equal, _, _, 'socketId');
 
 export interface ScoketActionType {
   type: string;
-  payload: onlineUser[];
+  payload: onlineUser[] | any;
 }
 
 export interface SoskcetStateType {
   isConnected: boolean;
   onlineUsers: onlineUser[];
+  mySocketState?: mySocketState;
 }
 
 export interface onlineUser {
   name: string;
   socketId: string;
   type: string;
+}
+
+export interface mySocketState extends onlineUser {
+  game: {
+    room: string;
+    ready: false;
+  };
 }
 const initialState: SoskcetStateType = {
   isConnected: false,
@@ -41,33 +49,34 @@ export const SocketReducer = (
   action: ScoketActionType
 ): any => {
   switch (action.type) {
-    case connect:
+    case connectUser:
       return { ...state, isConnected: true };
 
     case disConnect:
       return { ...state, isConnected: false };
 
     case AddonlineUser:
-      console.log(state);
       return {
         ...state,
         onlineUsers: [...state.onlineUsers, ...action.payload],
       };
 
     case NowonlineUser:
-      console.log(state, action.payload);
       return { ...state, onlineUsers: action.payload };
 
     case updateUser:
-      console.log(action.payload);
       const updateUsers = state.onlineUsers.map((oldUser) => {
-        return action.payload.some(equalId(oldUser))
-          ? action.payload.find(equalId(oldUser))
-          : oldUser;
+        return (
+          action.payload.find((user: onlineUser) => equalId(oldUser, user)) ||
+          oldUser
+        );
       });
       return { ...state, onlineUsers: updateUsers };
-
-    case matchUser:
+    case removeUser:
+      const remove = state.onlineUsers.filter(
+        (oldUser) => oldUser.socketId !== action.payload.socketId
+      );
+      return { ...state, onlineUsers: remove };
     default:
       return state;
   }
