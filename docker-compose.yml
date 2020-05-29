@@ -4,14 +4,14 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile_client
-    command: bash -c "yarn  && yarn start"
+    command: bash -c "npm install  && yarn build"
     working_dir: /app
     tty: true
     environment:
       - NODE_ENV=development
       - HOST=0.0.0.0
-    ports:
-      - 3000:3000
+    # ports:
+    #   - 3000:3000
     volumes:
       - ./client:/app
       - /app/node_modules
@@ -28,3 +28,12 @@ services:
     volumes:
       - ./websocket:/app
       - /app/node_modules
+  nginx:
+    image: nginx
+    tty: true
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./client/build:/var/www
