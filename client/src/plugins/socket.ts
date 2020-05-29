@@ -9,9 +9,16 @@ import {
   disConnect,
   setRoom,
   startGame,
+  finishGame,
+  requestMatch,
+  requestRecieve,
+  requestQuit,
+  callUser,
 } from '../actions/socket';
 import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
+import _ from 'lodash';
+
 export const wsUser = Ws('http://localhost:5000');
 interface onlineUser {
   name: string;
@@ -37,7 +44,6 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   let socketId: string = '';
   wsUser.on(connectUser, (req: any) => {
     dispatch({ type: connectUser, payload: req });
-    console.log(req);
     socketId = req;
   });
 
@@ -46,32 +52,36 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   });
 
   wsUser.on(AddonlineUser, (req: any) => {
-    dispatch({ type: AddonlineUser, payload: req });
+    const notMe = req.filter((user: onlineUser) => user.socketId !== socketId);
+    dispatch({ type: AddonlineUser, payload: notMe });
   });
 
   wsUser.on(NowonlineUser, (req: any) => {
-    dispatch({ type: NowonlineUser, payload: req });
+    const notMe = req.filter((user: onlineUser) => user.socketId !== socketId);
+    dispatch({ type: NowonlineUser, payload: notMe });
   });
 
   wsUser.on(matchUser, (req: mySocketState[]) => {
     const pare = req.filter(
       (user: onlineUser) => user.socketId.toString() !== socketId
     );
-    console.log(pare, socketId);
     dispatch({ type: matchUser, payload: pare });
     dispatch({ type: setRoom, payload: pare[0].game.room });
+  });
+
+  wsUser.on(requestQuit, () => {
+    dispatch({ type: requestRecieve, payload: false });
   });
 
   wsUser.on(updateUser, (req: onlineUser[]) => {
     dispatch({ type: updateUser, payload: req });
     const removeUser = req.filter((user: onlineUser) => {
-      return user.type === 'nomal';
+      return socketId !== user.socketId && user.type === 'nomal';
     });
-    console.log(req);
-    dispatch({ type: removePare, payload: removeUser });
+    if (!_.isEmpty(removeUser))
+      dispatch({ type: removePare, payload: removeUser });
   });
   wsUser.on(disConnect, (socketId: string) => {
-    console.log('disConnect', socketId);
     dispatch({ type: removePare, payload: [{ socketId: socketId }] });
     dispatch({ type: removeUser, payload: { socketId: socketId } });
   });
@@ -82,5 +92,22 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
       type: startGame,
       payload: time,
     });
+  });
+  wsUser.on(finishGame, (gameWin: { socketId: string; time: number }) => {
+    console.log(gameWin);
+    dispatch({
+      type: finishGame,
+      payload: gameWin,
+    });
+  });
+  wsUser.on(requestMatch, (user: { socketId: string; name: string }) => {
+    dispatch({
+      type: requestMatch,
+      payload: user,
+    });
+  });
+  wsUser.on(callUser, (roomId: string) => {
+    wsUser.emit('readyGO', { roomId });
+    dispatch({ type: setRoom, payload: roomId });
   });
 };

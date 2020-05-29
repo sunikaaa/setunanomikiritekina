@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import { gameStart, setUserName } from '../actions';
-import '../css/main.css';
+import '../css/main.scss';
 import '../css/beforeGame.scss';
 import { wsUser } from '../plugins/socket';
 const BeforeGame = () => {
@@ -28,8 +28,8 @@ const BeforeGame = () => {
     }
   };
   return (
-    <div className='beforegame'>
-      <div className='beforegame--name'>名前を入力して始めよう！</div>
+    <div className='beforegame '>
+      <div className='beforegame--name word-pre'>名前を入力して始めよう！</div>
       <div>
         <input
           type='text'

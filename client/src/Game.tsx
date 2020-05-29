@@ -11,7 +11,7 @@ const Game = () => {
 
 const switchMode = (word: string) => {
   switch (word) {
-    case 'home':
+    case 'nomal':
       return <HomeGame />;
     case 'waiting':
       return <WaitingGame />;

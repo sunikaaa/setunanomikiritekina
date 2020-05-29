@@ -1,7 +1,0 @@
-
-FROM node:12
-RUN apt-get update && \
-  apt-get install -y vim less
-RUN npm install npm -g
-RUN npm install -g nodemon
-RUN npm i -g @adonisjs/cli

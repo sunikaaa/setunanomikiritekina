@@ -7,7 +7,6 @@ const socketFunc = (
   io: SocketIO.Server,
   UserState: User
 ) => {
-  console.log('connect', socket.id);
   socket.emit('connectUser', socket.id);
 
   socket.on('setname', (name: string) => {
@@ -29,7 +28,23 @@ const socketFunc = (
     socket.broadcast.emit('disConnect', socket.id);
   });
 
-  socket.on('readyGO', (roomId) => {
+  socket.on('requestMatch', ({ socketId, user }) => {
+    socket.to(socketId).emit('requestMatch', user);
+  });
+
+  socket.on('quitRequest', ({ socketId }) => {
+    socket.to(socketId).emit('requestQuit');
+  });
+
+  socket.on('createRoom', ({ socketId }) => {
+    UserState.createRoom(socket.id, socketId);
+  });
+
+  socket.on('gameFire', ({ roomId, time }) => {
+    UserState.timeFire(socket.id, roomId, time);
+  });
+
+  socket.on('readyGO', ({ roomId }) => {
     socket.join(roomId, () => {
       UserState.readyGame(socket.id, roomId);
     });

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import './css/index.css';
-import './css/main.css';
+import './css/main.scss';
 import { NameContext } from './contexts/nameContext';
 import BeforeGame from './components/beforeGame';
 import Game from './Game';

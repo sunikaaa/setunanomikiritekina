@@ -3,8 +3,18 @@ import {
   gameFinish,
   gameStateChange,
   toHomeSetPure,
+  rematch,
 } from '../actions';
-import { matchUser, removePare, setRoom, startGame } from '../actions/socket';
+import {
+  matchUser,
+  removePare,
+  setRoom,
+  startGame,
+  finishGame,
+  requestMatch,
+  requestCancel,
+  requestRecieve,
+} from '../actions/socket';
 export interface GameActionType {
   type: string;
   payload: any;
@@ -29,20 +39,30 @@ interface PareState {
 
 export interface GameStateType {
   loggedIn: boolean;
-  userState: string;
+  userState: 'nomal' | 'waiting' | 'playing';
   pareState: PareState[];
   room: string;
   time: number;
   fire: boolean;
+  winner: string;
+  winnerTime: number;
   SocketState?: mySocketState;
+  requestUser: {};
+  isMatch?: boolean;
 }
+const gameInitial = {
+  fire: false,
+  winner: '',
+  winnerTime: 0,
+  time: 0,
+};
 const initialState: GameStateType = {
   loggedIn: false,
-  userState: 'home',
+  userState: 'nomal',
   pareState: [],
   room: '',
-  fire: false,
-  time: 10000000000000,
+  requestUser: {},
+  ...gameInitial,
 };
 export const GameReducer = (
   state = initialState,
@@ -54,23 +74,51 @@ export const GameReducer = (
     case gameFinish:
       return { ...state, loggedIn: false };
     case gameStateChange:
+      console.log(action.payload);
       return { ...state, userState: action.payload };
     case matchUser:
       return { ...state, pareState: action.payload };
     case removePare:
-      const pare = state.pareState.filter((user) => {
-        return action.payload.every(
-          (removeUser: PareState) => user.socketId !== removeUser.socketId
-        );
+      const bool = state.pareState.some((user) => {
+        return action.payload.every((updateUser: PareState) => {
+          return user.socketId === updateUser.socketId;
+        });
       });
-      console.log(pare);
-      return { ...state, pareState: pare };
+      if (bool) {
+        return { ...state, pareState: [], userState: 'nomal' };
+      } else {
+        return { ...state };
+      }
+    case finishGame:
+      return {
+        ...state,
+        winner: action.payload.socketId,
+        winnerTime: action.payload.time,
+      };
+    case requestRecieve:
+      return {
+        ...state,
+        isMatch: action.payload,
+      };
+    case requestMatch:
+      return {
+        ...state,
+        requestUser: action.payload,
+      };
+    case requestCancel:
+      return {
+        ...state,
+        requestUser: {},
+      };
     case 'Fire':
       return { ...state, fire: true };
     case toHomeSetPure:
+      console.log(state.userState);
       return { ...initialState, loggedIn: true };
     case setRoom:
       return { ...state, room: action.payload };
+    case rematch:
+      return { ...state, ...gameInitial };
     case startGame:
       return { ...state, userState: 'playing', time: action.payload };
     default:

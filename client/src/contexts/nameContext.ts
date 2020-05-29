@@ -17,11 +17,14 @@ export interface State {
 export const NameInitialState: State = {
   game: {
     loggedIn: false,
-    userState: 'home',
+    userState: 'nomal',
     pareState: [],
     room: '',
-    time: 10000000000000,
+    time: 0,
     fire: false,
+    winner: '',
+    winnerTime: 0,
+    requestUser: {},
   },
   user: {
     name: '',

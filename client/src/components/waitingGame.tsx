@@ -1,9 +1,9 @@
 import React, { useContext, useEffect } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/loading.scss';
-import '../css/main.css';
+import '../css/main.scss';
 import _ from 'lodash';
-import { gameStateChange } from '../actions';
+import { gameStateChange, rematch } from '../actions';
 import { wsToHome, wsUser } from '../plugins/socket';
 const WaitingPare = () => {
   useEffect(() => {
@@ -35,6 +35,12 @@ const WaitingGame = () => {
     wsToHome(state.game.pareState);
     dispatch({ type: gameStateChange, payload: 'home' });
   };
+
+  useEffect(() => {
+    wsUser.emit('serchPare');
+    dispatch({ type: rematch });
+    // eslint-disable-next-line
+  }, []);
   return (
     <>
       {_.isEmpty(state.game.pareState) ? <WaitingPare /> : <SeePare />}
@@ -49,7 +55,7 @@ const SeePare = () => {
   const { state } = useContext(NameContext);
 
   const complete = () => {
-    wsUser.emit('readyGO', state.game.room);
+    wsUser.emit('readyGO', { roomId: state.game.room });
   };
 
   return (
