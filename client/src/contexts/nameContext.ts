@@ -25,6 +25,7 @@ export const NameInitialState: State = {
     winner: '',
     winnerTime: 0,
     requestUser: {},
+    lag: 0
   },
   user: {
     name: '',

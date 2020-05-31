@@ -61,6 +61,7 @@ const HomeGame = () => {
     //homeに戻るたびに初期化
     dispatch({ type: toHomeSetPure });
     console.log('this is effect');
+    wsUser.emit("toHome");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -98,8 +99,8 @@ const HomeGame = () => {
             {value === 0 ? (
               <RandomMatch />
             ) : (
-              <WaitingPlayer requestedUser={requestedUser} />
-            )}
+                <WaitingPlayer requestedUser={requestedUser} />
+              )}
           </CSSTransition>
         </SwitchTransition>
       </div>
@@ -174,8 +175,10 @@ const OnlineUser: React.FC<propsOnlinceUser> = ({
     }
   }, [userState]);
   const requestMatch = (socketId: string) => {
-    requestedUser(socketId);
-    wsUser.emit('requestMatch', { socketId: socketId, user: state.user });
+    if (userState === "nomal") {
+      requestedUser(socketId);
+      wsUser.emit('requestMatch', { socketId: socketId, user: state.user });
+    }
   };
 
   return (
@@ -183,7 +186,7 @@ const OnlineUser: React.FC<propsOnlinceUser> = ({
       <div>{name}</div>
       <div className='flex flex-word'>
         <Button
-          color='primary'
+          color={userState === 'nomal' ? 'primary' : 'secondary'}
           onClick={() => {
             requestMatch(socketId);
           }}

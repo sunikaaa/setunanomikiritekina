@@ -6,11 +6,11 @@ const socketFunc = (
   socket: SocketIO.Socket,
   io: SocketIO.Server,
   UserState: User
-  ) => {
+) => {
   socket.emit('connectUser', socket.id);
   console.log(socket.id)
-  socket.on('setname', (name: string) => {
-    const user: UserState[] = UserState.add(name, socket.id, nomal);
+  socket.on('setname', ({ name, nowTime }) => {
+    const user: UserState[] = UserState.add(name, socket.id, nomal, nowTime);
     socket.emit('NowonlineUser', UserState.users);
     socket.broadcast.emit('AddonlineUser', user);
   });
@@ -18,6 +18,10 @@ const socketFunc = (
   socket.on('toHome', () => {
     UserState.update(socket.id, nomal);
   });
+
+  socket.on('setlag', () => {
+    UserState.setLag(socket.id);
+  })
 
   socket.on('serchPare', () => {
     UserState.update(socket.id, waiting);
@@ -27,6 +31,10 @@ const socketFunc = (
     UserState.remove(socket.id);
     socket.broadcast.emit('disConnect', socket.id);
   });
+
+  socket.on("setTime", (time: number) => {
+    socket.emit("timeLagSet", Date.now() - time);
+  })
 
   socket.on('requestMatch', ({ socketId, user }) => {
     socket.to(socketId).emit('requestMatch', user);

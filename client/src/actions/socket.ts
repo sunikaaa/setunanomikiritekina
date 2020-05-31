@@ -14,3 +14,4 @@ export const requestCancel = 'requestCancel';
 export const requestRecieve = 'requestRecieve';
 export const requestQuit = 'requestQuit';
 export const callUser = 'callUser';
+export const timeLagSet = 'timeLagSet'

@@ -40,8 +40,8 @@ const PreLoad = () => {
       {load ? (
         <PlayGame reload={reload} />
       ) : (
-        <div className='game-back whFull'></div>
-      )}
+          <div className='game-back whFull'></div>
+        )}
     </>
   );
 };
@@ -66,7 +66,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const now = Date.now();
+      const now = Date.now() + state.game.lag;
       if (now > state.game.time) {
         clearInterval(timer);
         setBomState(true);
@@ -128,7 +128,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
 
   //画面タップ時の処理
   const touchFire = () => {
-    const now = Date.now();
+    const now = Date.now() + state.game.lag;
     if (!state.game.fire) {
       if (now >= state.game.time) {
         wsUser.emit('gameFire', { time: now, roomId: state.game.room });
@@ -178,7 +178,7 @@ const Fire = ({ time }: any) => {
     // eslint-disable-next-line
     timer = setInterval(() => {
       if (!fire.current) {
-        const now = Date.now();
+        const now = Date.now() + state.game.lag;
         setstate(Math.floor((now - time) / 10));
       } else {
         clearInterval(timer);
@@ -235,7 +235,7 @@ const ModalDialog: React.FC<ModalDialog> = ({ match, reload }) => {
         <div
           className={`flex center mgtop20 weight800 size20 ${
             match === '勝利!!' ? 'red' : 'blue'
-          }`}
+            }`}
         >
           {match}
         </div>

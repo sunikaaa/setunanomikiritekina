@@ -10,7 +10,7 @@ const BeforeGame = () => {
 
   const randomMatch = (e: any): any => {
     e.preventDefault();
-    wsUser.emit('setname', name);
+    wsUser.emit('setname', { name: name, nowTime: Date.now() });
     dispatch({
       type: gameStart,
     });

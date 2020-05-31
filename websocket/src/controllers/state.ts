@@ -5,6 +5,7 @@ export interface UserState {
   type: string;
   socketId: string;
   name: string;
+  timelag: number;
   game: GameState;
 }
 
@@ -119,14 +120,17 @@ export class User extends EventEmitter {
   }
 
   removeMatchingListener() {
-    this.removeListener('match', () => {});
+    this.removeListener('match', () => { });
   }
 
-  add(name: string, socketId: string, type: string) {
+  add(name: string, socketId: string, type: string, time: number) {
+    const lag = Date.now() - time
+    console.log(lag, time)
     const send = {
       name,
       socketId,
       type,
+      timelag: lag,
       game: {
         ready: false,
         room: '',
@@ -136,6 +140,7 @@ export class User extends EventEmitter {
     return [send];
   }
 
+
   async remove(socketId: string) {
     this.users = await this.users.filter(
       (user: UserState) => user.socketId !== socketId
@@ -144,14 +149,13 @@ export class User extends EventEmitter {
   }
 
   update(socketId: string, type: string) {
-    const userIndex = this.users.findIndex(
-      (user: UserState) => socketId === user.socketId
-    );
-    let user = this.users[userIndex];
-    user.type = type;
-    this.users.splice(userIndex, 1, user);
-    this.onUpdate([user]);
-    return [user];
+    this.users.forEach((user: UserState) => {
+      if (user.socketId === socketId) {
+        user.type = type
+        this.onUpdate([user]);
+      }
+    })
+    return [this.users];
   }
 
   onUpdate(Users: UserState[]) {

@@ -14,6 +14,7 @@ import {
   requestRecieve,
   requestQuit,
   callUser,
+  timeLagSet
 } from '../actions/socket';
 import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
@@ -25,6 +26,7 @@ interface onlineUser {
   name: string;
   socketId: string;
   type: string;
+  lag: number;
 }
 interface mySocketState extends onlineUser {
   game: {
@@ -49,6 +51,7 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
     console.log(socketId);
   });
 
+
   wsUser.on(removePare, (req: any) => {
     dispatch({ type: removePare, payload: req });
   });
@@ -61,6 +64,9 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   wsUser.on(NowonlineUser, (req: any) => {
     const notMe = req.filter((user: onlineUser) => user.socketId !== socketId);
     dispatch({ type: NowonlineUser, payload: notMe });
+
+    const Me = req.find((user: onlineUser) => user.socketId === socketId);
+    dispatch({ type: timeLagSet, payload: Me.timelag })
   });
 
   wsUser.on(matchUser, (req: mySocketState[]) => {
@@ -112,4 +118,12 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
     wsUser.emit('readyGO', { roomId });
     dispatch({ type: setRoom, payload: roomId });
   });
+
+  setInterval(() => {
+    wsUser.emit("setTime", Date.now())
+  }, 5000)
+
+  wsUser.on(timeLagSet, (time: number) => {
+    dispatch({ type: timeLagSet, payload: time })
+  })
 };

@@ -14,6 +14,7 @@ import {
   requestMatch,
   requestCancel,
   requestRecieve,
+  timeLagSet
 } from '../actions/socket';
 export interface GameActionType {
   type: string;
@@ -44,6 +45,7 @@ export interface GameStateType {
   room: string;
   time: number;
   fire: boolean;
+  lag: number
   winner: string;
   winnerTime: number;
   SocketState?: mySocketState;
@@ -61,6 +63,7 @@ const initialState: GameStateType = {
   userState: 'nomal',
   pareState: [],
   room: '',
+  lag: 0,
   requestUser: {},
   ...gameInitial,
 };
@@ -114,13 +117,15 @@ export const GameReducer = (
       return { ...state, fire: true };
     case toHomeSetPure:
       console.log(state.userState);
-      return { ...initialState, loggedIn: true };
+      return { ...initialState, loggedIn: true, lag: state.lag };
     case setRoom:
       return { ...state, room: action.payload };
     case rematch:
       return { ...state, ...gameInitial };
     case startGame:
       return { ...state, userState: 'playing', time: action.payload };
+    case timeLagSet:
+      return { ...state, lag: action.payload }
     default:
       return state;
   }
