@@ -6,9 +6,9 @@ const socketFunc = (
   socket: SocketIO.Socket,
   io: SocketIO.Server,
   UserState: User
-) => {
+  ) => {
   socket.emit('connectUser', socket.id);
-
+  console.log(socket.id)
   socket.on('setname', (name: string) => {
     const user: UserState[] = UserState.add(name, socket.id, nomal);
     socket.emit('NowonlineUser', UserState.users);

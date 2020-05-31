@@ -19,7 +19,8 @@ import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
 import _ from 'lodash';
 
-export const wsUser = Ws('http://localhost:5000');
+export const wsUser = Ws("ws://133.130.101.109:3030");
+
 interface onlineUser {
   name: string;
   socketId: string;
@@ -45,6 +46,7 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   wsUser.on(connectUser, (req: any) => {
     dispatch({ type: connectUser, payload: req });
     socketId = req;
+    console.log(socketId);
   });
 
   wsUser.on(removePare, (req: any) => {
