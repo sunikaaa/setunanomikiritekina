@@ -3,7 +3,7 @@ import { NameContext } from '../contexts/nameContext';
 import '../css/main.scss';
 import '../css/homeGame.scss';
 import { gameStateChange, toHomeSetPure } from '../actions';
-import { requestMatch } from '../actions/socket';
+import { requestMatch, matchUser } from '../actions/socket';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -47,15 +47,9 @@ const HomeGame = () => {
   };
 
   useEffect(() => {
-    if (_.isBoolean(state.game.isMatch)) {
-      if (state.game.isMatch === true) {
-      } else {
-        setrequest('');
-        dispatch({ type: requestMatch, payload: {} });
-      }
-    }
+    setrequest('');
     // eslint-disable-next-line
-  }, [state.game.isMatch]);
+  }, [state.game.requestUser]);
 
   useEffect(() => {
     //homeに戻るたびに初期化
@@ -64,11 +58,6 @@ const HomeGame = () => {
     wsUser.emit("toHome");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (state.game.requestUser !== {}) {
-    }
-  }, [state.game.requestUser]);
 
   return (
     <div className={classes.root}>
@@ -236,7 +225,12 @@ const Request = ({ user }: { user: { socketId?: string; name?: string } }) => {
 
   const requestAgree = () => {
     wsUser.emit('createRoom', { socketId: user.socketId });
+    dispatch({ type: requestMatch, payload: {} });
   };
+
+
+
+
   return (
     <div className=''>
       <div className='home-request'>
@@ -262,6 +256,8 @@ const RequestEmit: React.FC<{
     wsUser.emit('quitRequest', { socketId: socketId });
     requestCancel();
   };
+
+
   return (
     <>
       <div className='loader'>応答待機中です。</div>

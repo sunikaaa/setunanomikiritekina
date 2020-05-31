@@ -101,10 +101,13 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
           left: '50%',
           transform: 'translateX(calc(-50% + 90px)) ',
         });
+        console.log("drow");
 
-        wsUser.emit('readyGO', { roomId: state.game.room });
-        dispatch({ type: rematch });
-        reload();
+        setTimeout(() => {
+          wsUser.emit('readyGO', { roomId: state.game.room });
+          dispatch({ type: rematch });
+          reload();
+        }, 1000);
       } else {
         //相手の勝利
         setmyCharacter({
@@ -196,9 +199,8 @@ const Fire = ({ time }: any) => {
     if (state.game.winner !== '') {
       clearInterval(timer);
       setTimeout(() => {
-        setstate(Math.floor((state.game.winnerTime - time) / 10));
+        setstate(Math.floor((state.game.winnerTime) / 10));
       }, 10);
-      setstate(Math.floor((state.game.winnerTime - time) / 10));
     }
     // eslint-disable-next-line
   }, [state.game.winner]);
@@ -217,9 +219,9 @@ interface ModalDialog extends PlayGame {
 const ModalDialog: React.FC<ModalDialog> = ({ match, reload }) => {
   const { state, dispatch } = useContext(NameContext);
   const reMatch = () => {
+    reload();
     wsUser.emit('readyGO', { roomId: state.game.room });
     dispatch({ type: rematch });
-    reload();
   };
   const quit = () => {
     wsToHome(state.game.pareState);

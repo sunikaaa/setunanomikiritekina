@@ -117,7 +117,7 @@ export const GameReducer = (
       return { ...state, fire: true };
     case toHomeSetPure:
       console.log(state.userState);
-      return { ...initialState, loggedIn: true, lag: state.lag };
+      return { ...initialState, loggedIn: true, lag: state.lag, requestUser: state.requestUser };
     case setRoom:
       return { ...state, room: action.payload };
     case rematch:

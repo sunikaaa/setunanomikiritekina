@@ -78,7 +78,7 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   });
 
   wsUser.on(requestQuit, () => {
-    dispatch({ type: requestRecieve, payload: false });
+    dispatch({ type: requestMatch, payload: {} });
   });
 
   wsUser.on(updateUser, (req: onlineUser[]) => {
