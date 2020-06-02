@@ -8,6 +8,11 @@
       "type": "image/x-icon"
     }
   ],
+  "sounds": [
+    {
+      "src": "sounds"
+    }
+  ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",

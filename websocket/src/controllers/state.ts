@@ -42,6 +42,7 @@ export class User extends EventEmitter {
       const waitUser = this.users.filter(
         (user: UserState) => user.type === 'waiting'
       );
+      if (!_.isEmpty(waitUser)) console.log(waitUser);
       waitUser.length > 1 && this.pareCreate(waitUser);
     }, 1000);
 
@@ -50,6 +51,7 @@ export class User extends EventEmitter {
       for (const room of Object.keys(this.rooms)) {
         if (this.rooms[room].user.every((user: UserState) => user.game.ready)) {
           const time = Date.now() + Math.floor(Math.random() * 3000) + 2000;
+          console.log(time);
           this.startGame(this.rooms[room], time);
           this.rooms[room] = Object.assign(
             {},
@@ -68,7 +70,7 @@ export class User extends EventEmitter {
   }
 
   startGame(room: Room, time: number) {
-    this.io.to(room.roomId).emit('startGame', time);
+    this.io.to(room.roomId).emit('startGame', { time, room: room.roomId });
   }
 
   pareCreate(waitUser: UserState[]) {
@@ -176,8 +178,9 @@ export class User extends EventEmitter {
     if (_.isUndefined(room)) return;
 
     const touchTime = time - room.time;
-    const drowTime = Math.abs(room.touchTime - touchTime) < 40;
-    console.log(roomId, room.touchTime, time - room.time);
+    const drowTime = Math.abs(room.touchTime - touchTime) < 20;
+    console.log(room.touchTime, time - room.time);
+    console.log(time, room.time, Number(time) - Number(room.time));
 
     if (_.isUndefined(room.touchTime)) {
       room.touchTime = touchTime;

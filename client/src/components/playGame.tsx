@@ -6,6 +6,26 @@ import { gameStateChange, rematch } from '../actions';
 import { wsUser, wsToHome } from '../plugins/socket';
 import man from '../img/kenjutsu_samurai_man.png';
 import woman from '../img/kenjutsu_samurai_woman.png';
+import { Howl } from 'howler';
+// import wind from '../sound/wind1.mp3';
+// import sword from '../sound/sword-slash1.mp3';
+// import knife from '../sound/knife-throw1.mp3';
+// import handgun from '../sound/handgun-firing1.mp3';
+
+const backWind = new Howl({
+  src: ["../sound/wind1.mp3"],
+})
+const swordDrow = new Howl({
+  src: ["../sound/sword-slash1.mp3"]
+})
+
+const handgunFire = new Howl({
+  src: ["../sound/handgun-firing1.mp3"]
+})
+const knifeTouch = new Howl({
+  src: ["../sound/knife-throw1.mp3"]
+})
+
 
 function useValueRef<T>(val: T) {
   const ref = React.useRef(val);
@@ -70,8 +90,13 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
       if (now > state.game.time) {
         clearInterval(timer);
         setBomState(true);
+        handgunFire.play();
       }
     }, 10);
+    backWind.play();
+    return () => {
+      backWind.stop();
+    }
     // eslint-disable-next-line
   }, []);
 
@@ -91,7 +116,9 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
         setTimeout(() => {
           setreMatch(true);
         }, 1000);
+        knifeTouch.play()
       } else if (state.game.winner === 'drow') {
+        swordDrow.play()
         //引き分け時の処理
         setmyCharacter({
           left: '50%',
@@ -124,6 +151,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
         }, 1000);
       }
       dispatch({ type: 'Fire' });
+
     }
 
     // eslint-disable-next-line
@@ -132,6 +160,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
   //画面タップ時の処理
   const touchFire = () => {
     const now = Date.now() + state.game.lag;
+    console.log(now);
     if (!state.game.fire) {
       if (now >= state.game.time) {
         wsUser.emit('gameFire', { time: now, roomId: state.game.room });
@@ -229,6 +258,9 @@ const ModalDialog: React.FC<ModalDialog> = ({ match, reload }) => {
     //homeに戻ると初期化される。
     dispatch({ type: gameStateChange, payload: 'home' });
   };
+  useEffect(() => {
+    backWind.stop();
+  }, [])
 
   return (
     <div>

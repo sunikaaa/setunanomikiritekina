@@ -3,7 +3,7 @@ import { NameContext } from '../contexts/nameContext';
 import '../css/main.scss';
 import '../css/homeGame.scss';
 import { gameStateChange, toHomeSetPure } from '../actions';
-import { requestMatch, matchUser } from '../actions/socket';
+import { requestMatch } from '../actions/socket';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';

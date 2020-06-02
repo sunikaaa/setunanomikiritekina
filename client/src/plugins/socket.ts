@@ -11,7 +11,6 @@ import {
   startGame,
   finishGame,
   requestMatch,
-  requestRecieve,
   requestQuit,
   callUser,
   timeLagSet
@@ -95,11 +94,15 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   });
 
   // Game move
-  wsUser.on(startGame, (time: number) => {
+  wsUser.on(startGame, ({ time, room }: { time: number, room: string }) => {
     dispatch({
       type: startGame,
       payload: time,
     });
+    dispatch({
+      type: setRoom,
+      payload: room
+    })
   });
   wsUser.on(finishGame, (gameWin: { socketId: string; time: number }) => {
     console.log(gameWin);

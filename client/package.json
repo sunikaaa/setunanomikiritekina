@@ -2,7 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://server:3333",
   "dependencies": {
     "@adonisjs/websocket-client": "^1.0.9",
     "@inlet/react-pixi": "^1.2.18",
@@ -11,6 +10,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@types/howler": "^2.1.2",
     "@types/jest": "^24.0.0",
     "@types/lodash": "^4.14.149",
     "@types/node": "^12.0.0",
@@ -23,6 +23,7 @@
     "@types/socket.io": "^2.1.4",
     "@types/socket.io-client": "^1.4.32",
     "axios": "^0.19.2",
+    "howler": "^2.2.0",
     "lodash": "^4.17.15",
     "pixi.js": "^5.2.3",
     "react": "^16.13.1",
