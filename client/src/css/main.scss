@@ -36,6 +36,7 @@
   width: 100vw;
   height: 100vh;
   background-color: antiquewhite;
+  overflow: hidden;
 }
 
 .abusolute {
@@ -58,7 +59,8 @@
 }
 
 .modal-overlay {
-  position: absolute;
+  position: fixed;
+  overflow: hidden;
   z-index: 10;
   background-color: grey;
   opacity: 0.8;
@@ -66,6 +68,7 @@
 
 .modal-overlay2 {
   position: fixed;
+  overflow: hidden;
   left: 0;
   top: 0;
   right: 0;
@@ -77,6 +80,7 @@
 
 .modal-box {
   position: absolute;
+  overflow: hidden;
   left: 50%;
   top: 50%;
   transform: translateX(-50%) translateY(-50%);

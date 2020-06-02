@@ -13,13 +13,13 @@ import {
   requestMatch,
   requestQuit,
   callUser,
-  timeLagSet
+  timeLagSet,
 } from '../actions/socket';
 import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
 import _ from 'lodash';
 
-export const wsUser = Ws("ws://133.130.101.109:3030");
+export const wsUser = Ws('ws://133.130.101.109:3030');
 
 interface onlineUser {
   name: string;
@@ -50,7 +50,6 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
     console.log(socketId);
   });
 
-
   wsUser.on(removePare, (req: any) => {
     dispatch({ type: removePare, payload: req });
   });
@@ -65,7 +64,7 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
     dispatch({ type: NowonlineUser, payload: notMe });
 
     const Me = req.find((user: onlineUser) => user.socketId === socketId);
-    dispatch({ type: timeLagSet, payload: Me.timelag })
+    dispatch({ type: timeLagSet, payload: Me.timelag });
   });
 
   wsUser.on(matchUser, (req: mySocketState[]) => {
@@ -94,15 +93,15 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   });
 
   // Game move
-  wsUser.on(startGame, ({ time, room }: { time: number, room: string }) => {
+  wsUser.on(startGame, ({ time, room }: { time: number; room: string }) => {
     dispatch({
       type: startGame,
       payload: time,
     });
     dispatch({
       type: setRoom,
-      payload: room
-    })
+      payload: room,
+    });
   });
   wsUser.on(finishGame, (gameWin: { socketId: string; time: number }) => {
     console.log(gameWin);
@@ -123,10 +122,10 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
   });
 
   setInterval(() => {
-    wsUser.emit("setTime", Date.now())
-  }, 5000)
+    wsUser.emit('setTime', Date.now());
+  }, 5000);
 
   wsUser.on(timeLagSet, (time: number) => {
-    dispatch({ type: timeLagSet, payload: time })
-  })
+    dispatch({ type: timeLagSet, payload: time });
+  });
 };

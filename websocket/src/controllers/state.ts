@@ -122,12 +122,12 @@ export class User extends EventEmitter {
   }
 
   removeMatchingListener() {
-    this.removeListener('match', () => { });
+    this.removeListener('match', () => {});
   }
 
   add(name: string, socketId: string, type: string, time: number) {
-    const lag = Date.now() - time
-    console.log(lag, time)
+    const lag = Date.now() - time;
+    console.log(lag, time);
     const send = {
       name,
       socketId,
@@ -142,7 +142,6 @@ export class User extends EventEmitter {
     return [send];
   }
 
-
   async remove(socketId: string) {
     this.users = await this.users.filter(
       (user: UserState) => user.socketId !== socketId
@@ -153,10 +152,10 @@ export class User extends EventEmitter {
   update(socketId: string, type: string) {
     this.users.forEach((user: UserState) => {
       if (user.socketId === socketId) {
-        user.type = type
+        user.type = type;
         this.onUpdate([user]);
       }
-    })
+    });
     return [this.users];
   }
 
@@ -178,19 +177,20 @@ export class User extends EventEmitter {
     if (_.isUndefined(room)) return;
 
     const touchTime = time - room.time;
-    const drowTime = Math.abs(room.touchTime - touchTime) < 20;
     console.log(room.touchTime, time - room.time);
     console.log(time, room.time, Number(time) - Number(room.time));
 
+    let drowTime = Math.abs(room.touchTime - touchTime) < 20;
+    console.log(time);
     if (_.isUndefined(room.touchTime)) {
       room.touchTime = touchTime;
-      room.win = socketId
+      room.win = socketId;
     }
 
     if (_.isNumber(room.touchTime) && room.touchTime - touchTime > 0) {
       clearInterval(room.timeoutID);
-      room.win = socketId
-      console.log("winner change")
+      room.win = socketId;
+      console.log('winner change');
     }
 
     if (_.isNumber(room.touchTime) && drowTime) {
@@ -199,7 +199,7 @@ export class User extends EventEmitter {
         socketId: room.win,
         time: room.touchTime,
       });
-    } else {
+    } else if (time !== 0) {
       room.timeoutID = setTimeout(() => {
         this.io.to(roomId).emit('finishGame', {
           socketId: room.win,

@@ -7,25 +7,34 @@ import { wsUser, wsToHome } from '../plugins/socket';
 import man from '../img/kenjutsu_samurai_man.png';
 import woman from '../img/kenjutsu_samurai_woman.png';
 import { Howl } from 'howler';
-// import wind from '../sound/wind1.mp3';
-// import sword from '../sound/sword-slash1.mp3';
-// import knife from '../sound/knife-throw1.mp3';
-// import handgun from '../sound/handgun-firing1.mp3';
+const wind = require('../sounds/wind1.mp3');
+const sword = require('../sounds/sword-slash1.mp3');
+const knife = require('../sounds/knife-throw1.mp3');
+const handgun = require('../sounds/handgun-firing1.mp3');
+const impact = require('../sounds/text-impact1.mp3');
 
 const backWind = new Howl({
-  src: ["../sound/wind1.mp3"],
-})
+  src: [wind],
+  onend: () => {
+    // 再生完了時のendイベント
+    console.log('Finished!');
+  },
+  volume: 0.6,
+});
 const swordDrow = new Howl({
-  src: ["../sound/sword-slash1.mp3"]
-})
+  src: [sword],
+});
+
+const backImpact = new Howl({
+  src: [impact],
+});
 
 const handgunFire = new Howl({
-  src: ["../sound/handgun-firing1.mp3"]
-})
+  src: [handgun],
+});
 const knifeTouch = new Howl({
-  src: ["../sound/knife-throw1.mp3"]
-})
-
+  src: [knife],
+});
 
 function useValueRef<T>(val: T) {
   const ref = React.useRef(val);
@@ -60,8 +69,8 @@ const PreLoad = () => {
       {load ? (
         <PlayGame reload={reload} />
       ) : (
-          <div className='game-back whFull'></div>
-        )}
+        <div className='game-back whFull'></div>
+      )}
     </>
   );
 };
@@ -73,6 +82,7 @@ interface PlayGame {
 const PlayGame: React.FC<PlayGame> = ({ reload }) => {
   const { state, dispatch } = useContext(NameContext);
   const [bomState, setBomState] = useState(false);
+  const [otetuki, setOtetuki] = useState(false);
   const [myCharacter, setmyCharacter] = useState<imageArea>({
     left: 10 + 'px',
     transform: 'rotateY(180deg)',
@@ -93,10 +103,11 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
         handgunFire.play();
       }
     }, 10);
+    backImpact.play();
     backWind.play();
     return () => {
       backWind.stop();
-    }
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -116,9 +127,9 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
         setTimeout(() => {
           setreMatch(true);
         }, 1000);
-        knifeTouch.play()
+        knifeTouch.play();
       } else if (state.game.winner === 'drow') {
-        swordDrow.play()
+        swordDrow.play();
         //引き分け時の処理
         setmyCharacter({
           left: '50%',
@@ -128,7 +139,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
           left: '50%',
           transform: 'translateX(calc(-50% + 90px)) ',
         });
-        console.log("drow");
+        console.log('drow');
 
         setTimeout(() => {
           wsUser.emit('readyGO', { roomId: state.game.room });
@@ -150,8 +161,8 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
           setreMatch(true);
         }, 1000);
       }
+      setOtetuki(false);
       dispatch({ type: 'Fire' });
-
     }
 
     // eslint-disable-next-line
@@ -164,6 +175,9 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
     if (!state.game.fire) {
       if (now >= state.game.time) {
         wsUser.emit('gameFire', { time: now, roomId: state.game.room });
+      } else {
+        setOtetuki(true);
+        wsUser.emit('gameFire', { time: 0, roomId: state.game.room });
       }
       dispatch({ type: 'Fire' });
     }
@@ -171,6 +185,11 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
 
   return (
     <div onClick={touchFire} className='whFull game-back'>
+      <div className='flex around align-center game-header'>
+        <div>{state.user.name}</div>
+        <div>ＶＳ</div>
+        <div>{state.game.pareState[0].name}</div>
+      </div>
       {bomState ? <Fire time={state.game.time} /> : null}
       {reMatch ? (
         <ModalDialog
@@ -197,6 +216,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
         className='absolute imageSoad'
         style={pareCharacter}
       />
+      <div className={otetuki ? 'mask' : 'none'}></div>
     </div>
   );
 };
@@ -228,7 +248,7 @@ const Fire = ({ time }: any) => {
     if (state.game.winner !== '') {
       clearInterval(timer);
       setTimeout(() => {
-        setstate(Math.floor((state.game.winnerTime) / 10));
+        setstate(Math.floor(state.game.winnerTime / 10));
       }, 10);
     }
     // eslint-disable-next-line
@@ -260,16 +280,16 @@ const ModalDialog: React.FC<ModalDialog> = ({ match, reload }) => {
   };
   useEffect(() => {
     backWind.stop();
-  }, [])
+  }, []);
 
   return (
-    <div>
-      <div className='whFull modal-overlay'></div>
+    <div className='whFull'>
+      <div className='whFull modal-overlay2'></div>
       <div className='modal-box game-modal-box'>
         <div
           className={`flex center mgtop20 weight800 size20 ${
             match === '勝利!!' ? 'red' : 'blue'
-            }`}
+          }`}
         >
           {match}
         </div>
