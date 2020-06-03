@@ -8,7 +8,7 @@ const socketFunc = (
   UserState: User
 ) => {
   socket.emit('connectUser', socket.id);
-  console.log(socket.id)
+  console.log(socket.id);
   socket.on('setname', ({ name, nowTime }) => {
     const user: UserState[] = UserState.add(name, socket.id, nomal, nowTime);
     socket.emit('NowonlineUser', UserState.users);
@@ -21,7 +21,7 @@ const socketFunc = (
 
   socket.on('setlag', () => {
     UserState.setLag(socket.id);
-  })
+  });
 
   socket.on('serchPare', () => {
     UserState.update(socket.id, waiting);
@@ -32,9 +32,9 @@ const socketFunc = (
     socket.broadcast.emit('disConnect', socket.id);
   });
 
-  socket.on("setTime", (time: number) => {
-    socket.emit("timeLagSet", Date.now() - time);
-  })
+  socket.on('setTime', (time: number) => {
+    socket.emit('timeLagSet', Date.now() - time);
+  });
 
   socket.on('requestMatch', ({ socketId, user }) => {
     socket.to(socketId).emit('requestMatch', user);
@@ -55,6 +55,7 @@ const socketFunc = (
   socket.on('readyGO', ({ roomId }) => {
     socket.join(roomId, () => {
       UserState.readyGame(socket.id, roomId);
+      io.to(roomId);
     });
   });
 };

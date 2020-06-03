@@ -169,6 +169,7 @@ export class User extends EventEmitter {
       if (user.socketId === socketId) {
         user.game.ready = true;
       }
+      this.io.to(user.socketId).emit('ready', socketId);
     });
   }
 

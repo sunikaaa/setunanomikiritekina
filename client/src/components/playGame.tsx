@@ -107,6 +107,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
     backWind.play();
     return () => {
       backWind.stop();
+      clearInterval(timer);
     };
     // eslint-disable-next-line
   }, []);
@@ -251,6 +252,9 @@ const Fire = ({ time }: any) => {
         setstate(Math.floor(state.game.winnerTime / 10));
       }, 10);
     }
+    return () => {
+      clearInterval(timer);
+    };
     // eslint-disable-next-line
   }, [state.game.winner]);
 

@@ -14,7 +14,8 @@ import {
   requestMatch,
   requestCancel,
   requestRecieve,
-  timeLagSet
+  timeLagSet,
+  ready,
 } from '../actions/socket';
 export interface GameActionType {
   type: string;
@@ -29,13 +30,17 @@ export interface onlineUser {
 export interface mySocketState extends onlineUser {
   game: {
     room: string;
-    ready: false;
+    ready: boolean;
   };
 }
 
 interface PareState {
   name: string;
   socketId: string;
+  game: {
+    room: string;
+    ready: boolean;
+  };
 }
 
 export interface GameStateType {
@@ -45,7 +50,7 @@ export interface GameStateType {
   room: string;
   time: number;
   fire: boolean;
-  lag: number
+  lag: number;
   winner: string;
   winnerTime: number;
   SocketState?: mySocketState;
@@ -117,7 +122,12 @@ export const GameReducer = (
       return { ...state, fire: true };
     case toHomeSetPure:
       console.log(state.userState);
-      return { ...initialState, loggedIn: true, lag: state.lag, requestUser: state.requestUser };
+      return {
+        ...initialState,
+        loggedIn: true,
+        lag: state.lag,
+        requestUser: state.requestUser,
+      };
     case setRoom:
       return { ...state, room: action.payload };
     case rematch:
@@ -125,7 +135,14 @@ export const GameReducer = (
     case startGame:
       return { ...state, userState: 'playing', time: action.payload };
     case timeLagSet:
-      return { ...state, lag: action.payload }
+      return { ...state, lag: action.payload };
+    case ready:
+      state.pareState.forEach((user) => {
+        if (action.payload === user.socketId) {
+          user.game.ready = true;
+        }
+      });
+      return { ...state };
     default:
       return state;
   }

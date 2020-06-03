@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/loading.scss';
 import '../css/main.scss';
@@ -45,7 +45,9 @@ const WaitingGame = () => {
     <>
       {_.isEmpty(state.game.pareState) ? <WaitingPare /> : <SeePare />}
       <div>
-        <button onClick={returnHome}>戻る</button>
+        <div onClick={returnHome} className='button'>
+          戻る
+        </div>
       </div>
     </>
   );
@@ -53,27 +55,35 @@ const WaitingGame = () => {
 
 const SeePare = () => {
   const { state } = useContext(NameContext);
-
+  const [OK, setOK] = useState(false);
   const complete = () => {
     wsUser.emit('readyGO', { roomId: state.game.room });
+    setOK(true);
   };
-
   return (
     <>
       <div className='flex around'>
         <div className='flex column'>
           <div>あなた</div>
-          <div>{state.user.name}</div>
+          <div className='size14'>
+            {state.user.name}
+            <div className='blue'>{OK ? 'OK!' : null}</div>
+          </div>
         </div>
         <div className='flex column'>
           <div>あいて</div>
           {state.game.pareState.map((user, index) => (
-            <div key={index}>{user.name}</div>
+            <div key={index} className='size14'>
+              {user.name}
+              <div className='blue'>{user.game.ready ? 'OK!' : null}</div>
+            </div>
           ))}
         </div>
       </div>
       <div className='flex center'>
-        <button onClick={complete}>準備完了</button>
+        <div onClick={complete} className='button'>
+          準備完了
+        </div>
       </div>
     </>
   );
