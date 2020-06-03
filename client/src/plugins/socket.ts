@@ -14,6 +14,7 @@ import {
   requestQuit,
   callUser,
   timeLagSet,
+  ready,
 } from '../actions/socket';
 import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
@@ -127,5 +128,10 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
 
   wsUser.on(timeLagSet, (time: number) => {
     dispatch({ type: timeLagSet, payload: time });
+  });
+
+  wsUser.on(ready, (socketId: string) => {
+    console.log('ready');
+    dispatch({ type: ready, payload: socketId });
   });
 };
