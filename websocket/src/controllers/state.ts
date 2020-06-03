@@ -115,6 +115,20 @@ export class User extends EventEmitter {
       this.io.to(user.socketId).emit('callUser', createId);
     });
   }
+
+  createCPU(socketId: string) {
+    const createId = uid() + Date.now();
+    const myData = this.users.find(
+      (user: UserState) => user.socketId === socketId
+    );
+
+    myData.room = createId;
+
+    this.rooms[createId] = { user: [myData], roomId: createId, cpu: true };
+
+    this.io.to(socketId)
+  }
+
   onMatching(pareUser: UserState[]) {
     pareUser.forEach((user: UserState) => {
       this.io.to(user.socketId).emit('matchUser', pareUser);
@@ -122,7 +136,7 @@ export class User extends EventEmitter {
   }
 
   removeMatchingListener() {
-    this.removeListener('match', () => {});
+    this.removeListener('match', () => { });
   }
 
   add(name: string, socketId: string, type: string, time: number) {
@@ -169,6 +183,7 @@ export class User extends EventEmitter {
       if (user.socketId === socketId) {
         user.game.ready = true;
       }
+      this.io.to(user.socketId).emit('ready', socketId);
     });
   }
 
@@ -182,6 +197,9 @@ export class User extends EventEmitter {
 
     let drowTime = Math.abs(room.touchTime - touchTime) < 20;
     console.log(time);
+    if (time === 0 && !_.isUndefined(room.touchTime)) {
+      room.touchTime = 0;
+    }
     if (_.isUndefined(room.touchTime)) {
       room.touchTime = touchTime;
       room.win = socketId;
