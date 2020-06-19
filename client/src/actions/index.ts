@@ -1,7 +1,10 @@
-export const gameStart: string = 'gameStart';
-export const gameFinish: string = 'gameFinish';
-export const setUserName: string = 'setUserName';
-export const nameSet: string = 'nameSet';
-export const gameStateChange: string = 'gameStateChange';
-export const toHomeSetPure: string = 'toHomeSetPure';
+export const gameStart = 'gameStart';
+export const gameFinish = 'gameFinish';
+export const setUserName = 'setUserName';
+export const nameSet = 'nameSet';
+export const gameStateChange = 'gameStateChange';
+export const toHomeSetPure = 'toHomeSetPure';
 export const rematch = 'rematch';
+export const aloneStart = 'aloneStart';
+export const YOULOSE = 'YOULOSE';
+export const levelUP = 'levelUP'

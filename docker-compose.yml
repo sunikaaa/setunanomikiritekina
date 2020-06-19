@@ -4,7 +4,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile_client
-    command: bash -c "yarn  && yarn start"
+    command: bash -c "yarn  && yarn build"
     working_dir: /app
     tty: true
     environment:
@@ -36,3 +36,4 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./client/build:/var/www
+  

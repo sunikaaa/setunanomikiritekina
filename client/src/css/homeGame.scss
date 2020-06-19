@@ -1,13 +1,19 @@
+@import "main.scss"; 
+
 .onLineUser {
   justify-content: space-around;
   vertical-align: text-bottom;
   align-items: center;
-}
+}zp
 .wh-center {
   justify-content: center;
   align-items: center;
   height: 90vh;
 }
+
+.flex-column {
+  flex-direction: column;
+} 
 
 .box {
   height: 100%;
@@ -78,4 +84,21 @@
   opacity: 0;
   transform: translateX(100%);
   transition: all 100ms ease-in;
+}
+
+.ranking {
+
+  &-table{
+  max-width: 800px;
+  border: none;
+  margin: 0 auto;
+  text-align: center;
+  min-width: 350px;
+  }
+
+  &-name {
+    max-width: 70%;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 }

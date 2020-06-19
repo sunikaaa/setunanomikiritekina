@@ -25,7 +25,9 @@ export const NameInitialState: State = {
     winner: '',
     winnerTime: 0,
     requestUser: {},
-    lag: 0
+    lag: 0,
+    isAlone: false,
+    aloneCount: 0
   },
   user: {
     name: '',
@@ -34,6 +36,7 @@ export const NameInitialState: State = {
   socket: {
     isConnected: false,
     onlineUsers: [],
+    ranking: []
   },
 };
 

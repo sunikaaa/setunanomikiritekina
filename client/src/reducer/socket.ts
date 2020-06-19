@@ -5,6 +5,7 @@ import {
   NowonlineUser,
   updateUser,
   removeUser,
+  showResult
 } from '../actions/socket';
 import _ from 'lodash';
 // tslint:disable-next-line:no-var-requires
@@ -25,12 +26,19 @@ export interface SoskcetStateType {
   isConnected: boolean;
   onlineUsers: onlineUser[];
   mySocketState?: mySocketState;
+  ranking: ranking[];
+
 }
 
 export interface onlineUser {
   name: string;
   socketId: string;
   type: string;
+}
+export interface ranking {
+  user: string,
+  count: number
+  rank: number
 }
 
 export interface mySocketState extends onlineUser {
@@ -42,6 +50,7 @@ export interface mySocketState extends onlineUser {
 const initialState: SoskcetStateType = {
   isConnected: false,
   onlineUsers: [],
+  ranking: []
 };
 
 export const SocketReducer = (
@@ -77,6 +86,8 @@ export const SocketReducer = (
         (oldUser) => oldUser.socketId !== action.payload.socketId
       );
       return { ...state, onlineUsers: remove };
+    case showResult:
+      return { ...state, ranking: action.payload };
     default:
       return state;
   }

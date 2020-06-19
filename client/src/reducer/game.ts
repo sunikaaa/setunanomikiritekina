@@ -4,6 +4,9 @@ import {
   gameStateChange,
   toHomeSetPure,
   rematch,
+  aloneStart,
+  YOULOSE,
+  levelUP
 } from '../actions';
 import {
   matchUser,
@@ -17,6 +20,8 @@ import {
   timeLagSet,
   ready,
 } from '../actions/socket';
+import _ from 'lodash'
+import { wsUser } from '../plugins/socket';
 export interface GameActionType {
   type: string;
   payload: any;
@@ -56,7 +61,10 @@ export interface GameStateType {
   SocketState?: mySocketState;
   requestUser: {};
   isMatch?: boolean;
+  isAlone: boolean;
+  aloneCount: number;
 }
+
 const gameInitial = {
   fire: false,
   winner: '',
@@ -67,9 +75,11 @@ const initialState: GameStateType = {
   loggedIn: false,
   userState: 'nomal',
   pareState: [],
+  isAlone: false,
   room: '',
   lag: 0,
   requestUser: {},
+  aloneCount: 0,
   ...gameInitial,
 };
 export const GameReducer = (
@@ -98,21 +108,34 @@ export const GameReducer = (
         return { ...state };
       }
     case finishGame:
+      console.log(action.payload.socketId)
       return {
         ...state,
         winner: action.payload.socketId,
         winnerTime: action.payload.time,
       };
+    case aloneStart:
+      return {
+        ...state,
+        isAlone: true
+      }
     case requestRecieve:
       return {
         ...state,
         isMatch: action.payload,
       };
     case requestMatch:
-      return {
-        ...state,
-        requestUser: action.payload,
-      };
+      if (_.isEmpty(state.requestUser)) {
+        return {
+          ...state,
+          requestUser: action.payload,
+        };
+      } else {
+        wsUser.emit("quitRequest", { socketId: action.payload.socketId });
+        return {
+          ...state
+        }
+      }
     case requestCancel:
       return {
         ...state,
@@ -126,12 +149,13 @@ export const GameReducer = (
         ...initialState,
         loggedIn: true,
         lag: state.lag,
-        requestUser: state.requestUser,
       };
     case setRoom:
       return { ...state, room: action.payload };
     case rematch:
       return { ...state, ...gameInitial };
+    case levelUP:
+      return { ...state, aloneCount: state.aloneCount + 1 };
     case startGame:
       return { ...state, userState: 'playing', time: action.payload };
     case timeLagSet:
@@ -143,6 +167,8 @@ export const GameReducer = (
         }
       });
       return { ...state };
+    case YOULOSE:
+      return { ...state, aloneCount: 0 }
     default:
       return state;
   }

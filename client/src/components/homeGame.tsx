@@ -2,17 +2,20 @@ import React, { useContext, useState, useEffect } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/main.scss';
 import '../css/homeGame.scss';
-import { gameStateChange, toHomeSetPure } from '../actions';
-import { requestMatch } from '../actions/socket';
+import { toHomeSetPure } from '../actions';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Button from '@material-ui/core/Button';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { wsUser } from '../plugins/socket';
 import _ from 'lodash';
 import '../css/loading.scss';
+import Modal from './common/modal';
+import RandomMatch from './homeGame/randomMatch'
+import WaitingPlayer from './homeGame/waitingPlayer'
+import Ranking from './homeGame/ranking';
+import { Request, RequestEmit } from './homeGame/request';
 
 function a11yProps(index: any) {
   return {
@@ -36,7 +39,6 @@ const HomeGame = () => {
   const { state, dispatch } = useContext(NameContext);
   const [requestState, setrequest] = useState('');
   const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    console.log(newValue);
     setValue(newValue);
   };
   const requestedUser = (socketId: string) => {
@@ -54,7 +56,6 @@ const HomeGame = () => {
   useEffect(() => {
     //homeに戻るたびに初期化
     dispatch({ type: toHomeSetPure });
-    console.log('this is effect');
     wsUser.emit("toHome");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -72,6 +73,7 @@ const HomeGame = () => {
         >
           <Tab label='Home' {...a11yProps(0)} />
           <Tab label='Player' {...a11yProps(1)} />
+          <Tab label='Ranking' {...a11yProps(2)} />
         </Tabs>
       </AppBar>
       <div className='box'>
@@ -85,11 +87,11 @@ const HomeGame = () => {
               node.addEventListener('transitionend', done, false)
             }
           >
-            {value === 0 ? (
-              <RandomMatch />
-            ) : (
-                <WaitingPlayer requestedUser={requestedUser} />
-              )}
+            <div className="mgtop60 ">
+              {value === 0 ? <RandomMatch /> : null}
+              {value === 1 ? <WaitingPlayer requestedUser={requestedUser} /> : null}
+              {value === 2 ? <Ranking /> : null}
+            </div>
           </CSSTransition>
         </SwitchTransition>
       </div>
@@ -107,167 +109,11 @@ const HomeGame = () => {
   );
 };
 
-interface WaitingPlayer {
-  requestedUser: (socketId: string) => void;
-}
-const WaitingPlayer: React.FC<WaitingPlayer> = ({ requestedUser }) => {
-  const { state } = useContext(NameContext);
-  return (
-    <div className='waiting-box'>
-      <div>PLAYER</div>
-      {state.socket.onlineUsers.map((user, key: number) => (
-        <OnlineUser
-          name={user.name}
-          key={key}
-          userState={user.type}
-          socketId={user.socketId}
-          requestedUser={requestedUser}
-        />
-      ))}
-    </div>
-  );
-};
-
-interface propsOnlinceUser extends WaitingPlayer {
-  name: string;
-  userState: string;
-  socketId: string;
-}
-
-const OnlineUser: React.FC<propsOnlinceUser> = ({
-  name,
-  userState,
-  socketId,
-  requestedUser,
-}) => {
-  const initlalState = {
-    word: 'オンライン',
-  };
-
-  const { state } = useContext(NameContext);
-
-  const [buttonState, setbutton] = useState(initlalState);
-
-  useEffect(() => {
-    switch (userState) {
-      case 'nomal':
-        setbutton({ word: 'オンライン' });
-        break;
-      case 'playing':
-        setbutton({ word: 'プレイ中' });
-        break;
-      case 'waiting':
-        setbutton({ word: 'マッチ待機中' });
-        break;
-      default:
-        break;
-    }
-  }, [userState]);
-  const requestMatch = (socketId: string) => {
-    if (userState === "nomal") {
-      requestedUser(socketId);
-      wsUser.emit('requestMatch', { socketId: socketId, user: state.user });
-    }
-  };
-
-  return (
-    <div className='flex border-bottom onLineUser'>
-      <div>{name}</div>
-      <div className='flex flex-word'>
-        <Button
-          color={userState === 'nomal' ? 'primary' : 'secondary'}
-          onClick={() => {
-            requestMatch(socketId);
-          }}
-        >
-          <span className='flex-word-button'>{buttonState.word}</span>
-          <span>対戦を申し込む</span>
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-const RandomMatch = () => {
-  const { dispatch } = useContext(NameContext);
-  const SerchPare = () => {
-    dispatch({
-      type: gameStateChange,
-      payload: 'waiting',
-    });
-  };
-  return (
-    <div>
-      <div className='flex wh-center mgt'>
-        <div className='button  waiting-button' onClick={SerchPare}>
-          ランダムマッチ
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Modal: React.FC = ({ children }) => {
-  return (
-    <div>
-      <div className='whFull modal-overlay2'></div>
-      <div className='modal-box'>{children}</div>
-    </div>
-  );
-};
-
-const Request = ({ user }: { user: { socketId?: string; name?: string } }) => {
-  const { dispatch } = useContext(NameContext);
-  const quitRequest = () => {
-    wsUser.emit('quitRequest', { socketId: user.socketId });
-    dispatch({ type: requestMatch, payload: {} });
-  };
-
-  const requestAgree = () => {
-    wsUser.emit('createRoom', { socketId: user.socketId });
-    dispatch({ type: requestMatch, payload: {} });
-  };
 
 
 
 
-  return (
-    <div className=''>
-      <div className='home-request'>
-        {user.name}から対戦を申し込まれました。
-      </div>
-      <div className='flex around'>
-        <div className='red button' onClick={requestAgree}>
-          対戦する
-        </div>
-        <div className='blue button' onClick={quitRequest}>
-          戻る
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const RequestEmit: React.FC<{
-  requestCancel: () => void;
-  socketId: string;
-}> = ({ requestCancel, socketId }) => {
-  const quitRequest = () => {
-    wsUser.emit('quitRequest', { socketId: socketId });
-    requestCancel();
-  };
 
 
-  return (
-    <>
-      <div className='loader'>応答待機中です。</div>
-      <div className='flex home-quit'>
-        <div className='button blue' onClick={quitRequest}>
-          戻る
-        </div>
-      </div>
-    </>
-  );
-};
 
 export default HomeGame;

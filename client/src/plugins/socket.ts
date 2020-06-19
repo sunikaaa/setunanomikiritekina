@@ -15,6 +15,7 @@ import {
   callUser,
   timeLagSet,
   ready,
+  showResult,
 } from '../actions/socket';
 import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
@@ -134,4 +135,32 @@ export const WrapwsUser = ({ state, dispatch }: ContextState) => {
     console.log('ready');
     dispatch({ type: ready, payload: socketId });
   });
+  interface ranking {
+    name: string;
+    count: number;
+    rank: number;
+    socketId: string
+  }
+  wsUser.on(showResult, (res: ranking[]) => {
+    let rank = 0;
+    let count = -1;
+    let commonRank = 0;
+    const Rank: Map<string, {}> = new Map();
+    res.forEach((user: ranking) => {
+      if (!Rank.has(user.socketId)) {
+        if (user.count === count) {
+          commonRank++;
+          user.rank = rank;
+        } else {
+          count = user.count;
+          rank += 1 + commonRank
+          user.rank = rank;
+          commonRank = 0;
+        }
+        Rank.set(user.socketId, user);
+        return user;
+      }
+    })
+    dispatch({ type: showResult, payload: Array.from(Rank.values()) });
+  })
 };

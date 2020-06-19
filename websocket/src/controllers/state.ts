@@ -1,6 +1,6 @@
 import uid from 'uid';
 import _ from 'lodash';
-const EventEmitter = require('events');
+import { EventEmitter } from 'events';
 export interface UserState {
   type: string;
   socketId: string;
@@ -17,23 +17,28 @@ interface GameState {
 interface Room {
   roomId: string;
   user: UserState[];
-  time: number;
-  win: string;
-  timeoutID: NodeJS.Timeout;
-  touchTime: number;
+  time?: number;
+  win?: string;
+  timeoutID?: NodeJS.Timeout;
+  touchTime?: number;
 }
+
+const myEvent = new EventEmitter();
 export class User extends EventEmitter {
+  users: UserState[];
+  private _option: UserState[];
+  io: any;
+  rooms: Map<string, Room>;
   constructor(
     io: SocketIO.Server,
     user: UserState[] = [],
-    option: UserState[] = [],
-    rooms = {}
+    option: UserState[] = []
   ) {
     super();
     this.users = user;
     this._option = option;
     this.io = io;
-    this.rooms = rooms;
+    this.rooms = new Map();
   }
 
   startInterval() {
@@ -48,29 +53,29 @@ export class User extends EventEmitter {
 
     //準備が完了したルームからゲームを開始する。
     setInterval(() => {
-      for (const room of Object.keys(this.rooms)) {
-        if (this.rooms[room].user.every((user: UserState) => user.game.ready)) {
+
+      this.rooms.forEach(room => {
+        if (room.user.every(user => user.game.ready)) {
           const time = Date.now() + Math.floor(Math.random() * 3000) + 2000;
-          console.log(time);
-          this.startGame(this.rooms[room], time);
-          this.rooms[room] = Object.assign(
-            {},
-            {
-              roomId: this.rooms[room].roomId,
-              user: this.rooms[room].user,
-            }
-          );
-          this.rooms[room].time = time;
-          this.rooms[room].user.forEach(
-            (user: UserState) => (user.game.ready = false)
-          );
+          this.startGame(room, time);
+          room = this.initializeRoom(room);
+          room.time = time;
         }
-      }
+      })
     }, 1000);
   }
 
   startGame(room: Room, time: number) {
+    this.emit("startGame", { to: room.roomId, emit: { time, room: room.roomId } });
     this.io.to(room.roomId).emit('startGame', { time, room: room.roomId });
+  }
+
+  initializeRoom(room: Room) {
+    room.timeoutID = undefined;
+    room.win = undefined;
+    room.touchTime = undefined;
+    room.user.forEach(user => user.game.ready = false);
+    return room;
   }
 
   pareCreate(waitUser: UserState[]) {
@@ -89,7 +94,11 @@ export class User extends EventEmitter {
       this.update(user.socketId, 'playing');
       user.game.room = createId;
     });
-    this.rooms[createId] = { user: this._option, roomId: createId };
+    const room: Room = {
+      user: this._option,
+      roomId: createId,
+    }
+    this.rooms.set(createId, room)
     this.onMatching(this._option);
     this._option = [];
     if (waitUser.length > 0) {
@@ -105,32 +114,28 @@ export class User extends EventEmitter {
     const pareData = this.users.find(
       (user: UserState) => user.socketId === PareSocketId
     );
-
-    myData.room = createId;
-    pareData.room = createId;
-    this.rooms[createId] = { user: [myData, pareData], roomId: createId };
+    if (_.isUndefined(myData) || _.isUndefined(myData)) {
+      return;
+    }
+    myData.game.room = createId;
+    pareData.game.room = createId;
+    const room: Room = {
+      user: [myData, pareData],
+      roomId: createId
+    }
+    this.rooms.set(createId, room);
     this.onMatching([myData, pareData]);
-    console.log(this.rooms);
     [myData, pareData].forEach((user: UserState) => {
+      this.emit("callUser", { user, createId });
       this.io.to(user.socketId).emit('callUser', createId);
     });
   }
 
-  createCPU(socketId: string) {
-    const createId = uid() + Date.now();
-    const myData = this.users.find(
-      (user: UserState) => user.socketId === socketId
-    );
 
-    myData.room = createId;
-
-    this.rooms[createId] = { user: [myData], roomId: createId, cpu: true };
-
-    this.io.to(socketId)
-  }
 
   onMatching(pareUser: UserState[]) {
     pareUser.forEach((user: UserState) => {
+      this.emit("matchUser", { user, pareUser });
       this.io.to(user.socketId).emit('matchUser', pareUser);
     });
   }
@@ -141,7 +146,6 @@ export class User extends EventEmitter {
 
   add(name: string, socketId: string, type: string, time: number) {
     const lag = Date.now() - time;
-    console.log(lag, time);
     const send = {
       name,
       socketId,
@@ -174,41 +178,48 @@ export class User extends EventEmitter {
   }
 
   onUpdate(Users: UserState[]) {
+    this.emit("updateUser", Users);
     this.io.emit('updateUser', Users);
   }
 
   readyGame(socketId: string, roomId: string) {
-    const room: Room = this.rooms[roomId];
+    const room: Room = this.rooms.get(roomId);
     room.user.forEach((user: UserState) => {
       if (user.socketId === socketId) {
         user.game.ready = true;
       }
+      this.emit("ready", user, socketId);
       this.io.to(user.socketId).emit('ready', socketId);
     });
   }
 
   timeFire(socketId: string, roomId: string, time: number) {
-    const room: Room = this.rooms[roomId];
+    const room = this.rooms.get(roomId);
     if (_.isUndefined(room)) return;
 
     const touchTime = time - room.time;
-    console.log(room.touchTime, time - room.time);
-    console.log(time, room.time, Number(time) - Number(room.time));
 
     let drowTime = Math.abs(room.touchTime - touchTime) < 20;
-    console.log(time);
-    if (time === 0 && !_.isUndefined(room.touchTime)) {
-      room.touchTime = 0;
+
+
+    if (room.touchTime === -room.time) {
+      room.touchTime = time;
+      room.win = socketId;
+    }
+
+    if (time === 0) {
+      room.touchTime = touchTime;
     }
     if (_.isUndefined(room.touchTime)) {
       room.touchTime = touchTime;
       room.win = socketId;
     }
 
+
     if (_.isNumber(room.touchTime) && room.touchTime - touchTime > 0) {
       clearInterval(room.timeoutID);
       room.win = socketId;
-      console.log('winner change');
+      room.touchTime = touchTime;
     }
 
     if (_.isNumber(room.touchTime) && drowTime) {

@@ -2,47 +2,15 @@ import React, { useContext, useEffect, useState } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/main.scss';
 import '../css/playGame.scss';
-import { gameStateChange, rematch } from '../actions';
-import { wsUser, wsToHome } from '../plugins/socket';
+import { rematch } from '../actions';
+import { wsUser } from '../plugins/socket';
 import man from '../img/kenjutsu_samurai_man.png';
 import woman from '../img/kenjutsu_samurai_woman.png';
-import { Howl } from 'howler';
-const wind = require('../sounds/wind1.mp3');
-const sword = require('../sounds/sword-slash1.mp3');
-const knife = require('../sounds/knife-throw1.mp3');
-const handgun = require('../sounds/handgun-firing1.mp3');
-const impact = require('../sounds/text-impact1.mp3');
+import { finishGame } from '../actions/socket';
+import { knifeTouch, swordDrow, handgunFire, backImpact, backWind } from './playGame/musicLoad'
+import Result from './playGame/result'
+import { Fire } from './playGame/fire';
 
-const backWind = new Howl({
-  src: [wind],
-  onend: () => {
-    // 再生完了時のendイベント
-    console.log('Finished!');
-  },
-  volume: 0.6,
-});
-const swordDrow = new Howl({
-  src: [sword],
-});
-
-const backImpact = new Howl({
-  src: [impact],
-});
-
-const handgunFire = new Howl({
-  src: [handgun],
-});
-const knifeTouch = new Howl({
-  src: [knife],
-});
-
-function useValueRef<T>(val: T) {
-  const ref = React.useRef(val);
-  React.useEffect(() => {
-    ref.current = val;
-  }, [val]);
-  return ref;
-}
 
 interface imageArea {
   left?: string;
@@ -69,17 +37,13 @@ const PreLoad = () => {
       {load ? (
         <PlayGame reload={reload} />
       ) : (
-        <div className='game-back whFull'></div>
-      )}
+          <div className='game-back whFull'></div>
+        )}
     </>
   );
 };
 
-interface PlayGame {
-  reload: () => void;
-}
-
-const PlayGame: React.FC<PlayGame> = ({ reload }) => {
+const PlayGame: React.FC<any> = ({ reload }) => {
   const { state, dispatch } = useContext(NameContext);
   const [bomState, setBomState] = useState(false);
   const [otetuki, setOtetuki] = useState(false);
@@ -93,14 +57,16 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
   });
 
   const [reMatch, setreMatch] = useState(false);
+  const alone = state.game.isAlone;
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const now = Date.now() + state.game.lag;
+      const now = alone ? Date.now() : Date.now() + state.game.lag;
       if (now > state.game.time) {
         clearInterval(timer);
         setBomState(true);
         handgunFire.play();
+
       }
     }, 10);
     backImpact.play();
@@ -109,6 +75,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
       backWind.stop();
       clearInterval(timer);
     };
+
     // eslint-disable-next-line
   }, []);
 
@@ -117,13 +84,13 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
       if (state.game.winner === state.user.socketId) {
         //自分の勝利
         setmyCharacter({
-          right: 110 + 'px',
+          right: 150 + 'px',
           transform: 'rotateZ(15deg) rotateY(180deg)',
         });
         setpareCharacter({
-          right: 20 + 'px',
+          right: 100 + 'px',
           transform: 'rotateZ(90deg) ',
-          bottom: '10px',
+          bottom: '15px',
         });
         setTimeout(() => {
           setreMatch(true);
@@ -140,7 +107,6 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
           left: '50%',
           transform: 'translateX(calc(-50% + 90px)) ',
         });
-        console.log('drow');
 
         setTimeout(() => {
           wsUser.emit('readyGO', { roomId: state.game.room });
@@ -150,12 +116,12 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
       } else {
         //相手の勝利
         setmyCharacter({
-          left: 20 + 'px',
+          left: 30 + 'px',
           transform: 'rotateZ(-90deg) rotateY(180deg)',
           bottom: '10px',
         });
         setpareCharacter({
-          left: 110 + 'px',
+          left: 120 + 'px',
           transform: 'rotateZ(-10deg) ',
         });
         setTimeout(() => {
@@ -171,29 +137,28 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
 
   //画面タップ時の処理
   const touchFire = () => {
-    const now = Date.now() + state.game.lag;
-    console.log(now);
+    const now = alone ? Date.now() : Date.now() + state.game.lag;
     if (!state.game.fire) {
       if (now >= state.game.time) {
-        wsUser.emit('gameFire', { time: now, roomId: state.game.room });
+        alone ? dispatch({ type: finishGame, payload: { time: now - state.game.time, socketId: state.user.socketId } }) : wsUser.emit('gameFire', { time: now, roomId: state.game.room });
       } else {
         setOtetuki(true);
-        wsUser.emit('gameFire', { time: 0, roomId: state.game.room });
+        !alone && wsUser.emit('gameFire', { time: 0, roomId: state.game.room });
       }
       dispatch({ type: 'Fire' });
     }
   };
 
   return (
-    <div onClick={touchFire} className='whFull game-back'>
+    <div onClick={touchFire} className='whFull game-back ovh'>
       <div className='flex around align-center game-header'>
-        <div>{state.user.name}</div>
+        <div className="game-name">{state.user.name}</div>
         <div>ＶＳ</div>
-        <div>{state.game.pareState[0].name}</div>
+        <div className="game-name">{alone ? `CPULevel${state.game.aloneCount + 1}` : state.game.pareState[0].name}</div>
       </div>
       {bomState ? <Fire time={state.game.time} /> : null}
       {reMatch ? (
-        <ModalDialog
+        <Result
           match={
             state.game.winner === state.user.socketId ? '勝利!!' : '敗北...'
           }
@@ -222,96 +187,5 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
   );
 };
 
-const Fire = ({ time }: any) => {
-  const [nowTime, setstate] = useState(0);
-  const { state } = useContext(NameContext);
-  const fire = useValueRef(state.game.fire);
-  let timer: NodeJS.Timer;
-  useEffect(() => {
-    // eslint-disable-next-line
-    timer = setInterval(() => {
-      if (!fire.current) {
-        const now = Date.now() + state.game.lag;
-        setstate(Math.floor((now - time) / 10));
-      } else {
-        clearInterval(timer);
-      }
 
-      return () => {
-        clearInterval(timer);
-      };
-    }, 10);
-
-    // eslint-disable-next-line
-  }, []);
-
-  useEffect(() => {
-    if (state.game.winner !== '') {
-      clearInterval(timer);
-      setTimeout(() => {
-        setstate(Math.floor(state.game.winnerTime / 10));
-      }, 10);
-    }
-    return () => {
-      clearInterval(timer);
-    };
-    // eslint-disable-next-line
-  }, [state.game.winner]);
-
-  return (
-    <div className='center flex game-time'>
-      <div className='timer'>{nowTime}</div>
-    </div>
-  );
-};
-
-interface ModalDialog extends PlayGame {
-  match: string;
-}
-
-const ModalDialog: React.FC<ModalDialog> = ({ match, reload }) => {
-  const { state, dispatch } = useContext(NameContext);
-  const reMatch = () => {
-    reload();
-    wsUser.emit('readyGO', { roomId: state.game.room });
-    dispatch({ type: rematch });
-  };
-  const quit = () => {
-    wsToHome(state.game.pareState);
-
-    //homeに戻ると初期化される。
-    dispatch({ type: gameStateChange, payload: 'home' });
-  };
-  useEffect(() => {
-    backWind.stop();
-  }, []);
-
-  return (
-    <div className='whFull'>
-      <div className='whFull modal-overlay2'></div>
-      <div className='modal-box game-modal-box'>
-        <div
-          className={`flex center mgtop20 weight800 size20 ${
-            match === '勝利!!' ? 'red' : 'blue'
-          }`}
-        >
-          {match}
-        </div>
-        <div className='game-modal-rematch mgtop20'>もういちど戦う？</div>
-        <div className='flex around align-center '>
-          <div>
-            <div className='game-modal-button green word-pre' onClick={reMatch}>
-              たたかう
-            </div>
-          </div>
-          <div>
-            <div className='game-modal-button blue word-pre' onClick={quit}>
-              やめる
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 export default PreLoad;

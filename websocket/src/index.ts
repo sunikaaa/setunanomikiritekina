@@ -7,16 +7,13 @@ var app = express();
 
 const server: any = require('http').createServer(app);
 const PORT = process.env.PORT || 3030;
-const io = Server(server)
+export const io = Server(server)
 
-const UserState = new User(io);
-UserState.startInterval();
-const socketFn = _.partial(socketFanc, _, io, UserState);
+export const EventUser = new User(io);
+EventUser.startInterval();
+const socketFn = _.partial(socketFanc, _, io, EventUser);
 io.on('connection', socketFn);
 server.listen(PORT, () => {
   console.log('http://0.0.0.0' + ':3030');
 });
 
-app.get('/', (req, res) => {
-  res.send('hello');
-});

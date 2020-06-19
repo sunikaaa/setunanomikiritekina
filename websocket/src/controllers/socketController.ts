@@ -1,6 +1,18 @@
 import { User, UserState } from './state';
+import _ from 'lodash';
+import { io, EventUser } from '../index';
 const waiting: string = 'waiting';
 const nomal: string = 'nomal';
+
+interface UserRESULT {
+  user: string,
+  count: number,
+  socketId: string
+}
+
+let UserRESULT: UserRESULT[] = [];
+
+
 
 const socketFunc = (
   socket: SocketIO.Socket,
@@ -19,9 +31,6 @@ const socketFunc = (
     UserState.update(socket.id, nomal);
   });
 
-  socket.on('setlag', () => {
-    UserState.setLag(socket.id);
-  });
 
   socket.on('serchPare', () => {
     UserState.update(socket.id, waiting);
@@ -58,6 +67,14 @@ const socketFunc = (
       io.to(roomId);
     });
   });
+
+  socket.on("RESULTCOUNT", ({ count, user }) => {
+    UserRESULT.push({ count, user, socketId: socket.id });
+  })
+
+  socket.on("showResult", () => {
+    socket.emit("showResult", _.sortBy(UserRESULT, "count").reverse())
+  })
 };
 
 export default socketFunc;

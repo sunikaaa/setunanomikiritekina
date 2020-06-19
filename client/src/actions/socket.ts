@@ -16,3 +16,7 @@ export const requestQuit = 'requestQuit';
 export const callUser = 'callUser';
 export const timeLagSet = 'timeLagSet';
 export const ready = 'ready';
+export const showResult = "showResult";
+
+
+
