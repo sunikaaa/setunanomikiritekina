@@ -23,6 +23,8 @@ interface Room {
   touchTime?: number;
 }
 
+
+
 const myEvent = new EventEmitter();
 export class User extends EventEmitter {
   users: UserState[];
