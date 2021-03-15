@@ -20,7 +20,7 @@ import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
 import _ from 'lodash';
 
-export const wsUser = Ws("ws://133.130.101.109:3030");
+export const wsUser = Ws("ws://192.168.33.10:3030");
 
 interface onlineUser {
   name: string;
