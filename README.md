@@ -1,11 +1,15 @@
 
 刹那の見斬り　的なやつ
 ===
-How to Play
-dokcer,docker-composeをインストールしてください。
-/client/src/plugins/socket.tsファイル内のimport分のすぐ下に存在するIPアドレス（画像内部の白線部）は環境ごとに変更する必要があります。
-ローカルならlocalhost
-vagrantで起動させたならばvagrantFileに記述したIPアドレス
+# これは WebSocket と react を使用したピンクの悪魔の刹那の見斬りをリスペクトしたゲームです。
+
+二人用のゲームです。  
+ランダムマッチング機能と申請マッチ機能が搭載されています。
+# How to Run  
+dokcer,docker-composeをインストールしてください。  
+/client/src/plugins/socket.tsファイル内のimport分のすぐ下に存在するIPアドレス（画像内部の白線部）は環境ごとに変更する必要があります。  
+ローカルならlocalhost  
+vagrantで起動させたならばvagrantFileに記述したIPアドレス  
 その他レンタルサーバー等でも同様にIPアドレスを適当に記述してください。
 
 ![screenshot 1615837359](https://user-images.githubusercontent.com/48460859/111211808-331cf080-8612-11eb-8f71-b3e8cac531e0.jpg)
@@ -13,10 +17,6 @@ vagrantで起動させたならばvagrantFileに記述したIPアドレス
 その後、ルートディレクトリでdocker-compose upを使用してください。
 
 
-# これは WebSocket と react を使用したピンクの悪魔の刹那の見斬りをリスペクトしたゲームです。
-
-二人用のゲームです。
-ランダムマッチング機能と申請マッチ機能が搭載されています。
 ## 接続すると以下のようなホーム画面が出てくるので名前を入力後enterかスタートを押してください。
 ![screenshot 1615836501](https://user-images.githubusercontent.com/48460859/111210005-0cf65100-8610-11eb-8085-7aa80426fe8a.jpg)
 
