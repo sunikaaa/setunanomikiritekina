@@ -4,22 +4,12 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile_client
-<<<<<<< HEAD
     command: bash -c "yarn  && yarn build"
-=======
-    command: bash -c "npm install  && yarn start"
->>>>>>> develop
     working_dir: /app
     tty: true
     environment:
       - NODE_ENV=development
       - HOST=0.0.0.0
-    ports:
-<<<<<<< HEAD
-      - 3000:3000
-=======
-      - 3001:3000
->>>>>>> develop
     volumes:
       - ./client:/app
       - /app/node_modules
