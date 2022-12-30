@@ -1,7 +1,8 @@
 import { createContext } from 'react';
 import { GameStateType } from '../reducer/game';
-import { SoskcetStateType } from '../reducer/socket';
+import { SocketStateType } from '../reducer/socket';
 import { UserStateType } from '../reducer/user';
+import {normal,gameWindowState} from '../actions/gamePage'
 
 export interface ContextState {
   state: State;
@@ -11,13 +12,13 @@ export interface ContextState {
 export interface State {
   game: GameStateType;
   user: UserStateType;
-  socket: SoskcetStateType;
+  socket: SocketStateType;
 }
 
 export const NameInitialState: State = {
   game: {
     loggedIn: false,
-    userState: 'nomal',
+    userState: normal,
     pareState: [],
     room: '',
     time: 0,

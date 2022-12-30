@@ -176,7 +176,7 @@ export class User extends EventEmitter {
     if (_.isUndefined(room)) return;
 
     const touchTime = time - room.time;
-    const drowTime = Math.abs(room.touchTime - touchTime) < 40;
+    const isDrawTime = Math.abs(room.touchTime - touchTime) < 40;
     console.log(roomId, room.touchTime, time - room.time);
 
     if (_.isUndefined(room.touchTime)) {
@@ -184,14 +184,16 @@ export class User extends EventEmitter {
       room.win = socketId
     }
 
-    if (_.isNumber(room.touchTime) && room.touchTime - touchTime > 0) {
+    if(!_.isNumber(room.touchTime)) return
+
+    if ( room.touchTime - touchTime > 0) {
       clearInterval(room.timeoutID);
       room.win = socketId
       console.log("winner change")
     }
 
-    if (_.isNumber(room.touchTime) && drowTime) {
-      room.win = 'drow';
+    if (isDrawTime) {
+      room.win = 'draw';
       this.io.to(roomId).emit('finishGame', {
         socketId: room.win,
         time: room.touchTime,

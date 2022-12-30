@@ -13,9 +13,15 @@ import {
   finishGame,
   requestMatch,
   requestCancel,
-  requestRecieve,
+  requestReceive,
   timeLagSet
 } from '../actions/socket';
+import {
+  normal,
+  playing,
+  waiting,
+  gameWindowState
+} from '../actions/gamePage'
 export interface GameActionType {
   type: string;
   payload: any;
@@ -38,9 +44,10 @@ interface PareState {
   socketId: string;
 }
 
+
 export interface GameStateType {
   loggedIn: boolean;
-  userState: 'nomal' | 'waiting' | 'playing';
+  gameWindowState: gameWindowState;
   pareState: PareState[];
   room: string;
   time: number;
@@ -60,7 +67,7 @@ const gameInitial = {
 };
 const initialState: GameStateType = {
   loggedIn: false,
-  userState: 'nomal',
+  gameWindowState: normal,
   pareState: [],
   room: '',
   lag: 0,
@@ -78,7 +85,7 @@ export const GameReducer = (
       return { ...state, loggedIn: false };
     case gameStateChange:
       console.log(action.payload);
-      return { ...state, userState: action.payload };
+      return { ...state, gameWindowState: action.payload };
     case matchUser:
       return { ...state, pareState: action.payload };
     case removePare:
@@ -88,7 +95,7 @@ export const GameReducer = (
         });
       });
       if (bool) {
-        return { ...state, pareState: [], userState: 'nomal' };
+        return { ...state, pareState: [], gameWindowState: normal };
       } else {
         return { ...state };
       }
@@ -98,7 +105,7 @@ export const GameReducer = (
         winner: action.payload.socketId,
         winnerTime: action.payload.time,
       };
-    case requestRecieve:
+    case requestReceive:
       return {
         ...state,
         isMatch: action.payload,
@@ -116,14 +123,14 @@ export const GameReducer = (
     case 'Fire':
       return { ...state, fire: true };
     case toHomeSetPure:
-      console.log(state.userState);
+      console.log(state.gameWindowState);
       return { ...initialState, loggedIn: true, lag: state.lag, requestUser: state.requestUser };
     case setRoom:
       return { ...state, room: action.payload };
     case rematch:
       return { ...state, ...gameInitial };
     case startGame:
-      return { ...state, userState: 'playing', time: action.payload };
+      return { ...state, gameWindowState: playing, time: action.payload };
     case timeLagSet:
       return { ...state, lag: action.payload }
     default:

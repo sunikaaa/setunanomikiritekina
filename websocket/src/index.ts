@@ -17,6 +17,6 @@ server.listen(PORT, () => {
   console.log('http://0.0.0.0' + ':3030');
 });
 
-app.get('/', (req, res) => {
-  res.send('hello');
-});
+// app.get('/', (req, res) => {
+//   res.send('hello');
+// });

@@ -21,7 +21,7 @@ export interface ScoketActionType {
   payload: onlineUser[] | any;
 }
 
-export interface SoskcetStateType {
+export interface SocketStateType {
   isConnected: boolean;
   onlineUsers: onlineUser[];
   mySocketState?: mySocketState;
@@ -39,7 +39,7 @@ export interface mySocketState extends onlineUser {
     ready: false;
   };
 }
-const initialState: SoskcetStateType = {
+const initialState: SocketStateType = {
   isConnected: false,
   onlineUsers: [],
 };

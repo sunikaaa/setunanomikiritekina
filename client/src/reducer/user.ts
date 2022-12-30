@@ -9,13 +9,13 @@ export interface UserStateType {
   name: string;
   socketId: string;
 }
-const initlalState: UserStateType = {
+const initialState: UserStateType = {
   name: '',
   socketId: '',
 };
 
 export const UserReducer = (
-  state = initlalState,
+  state = initialState,
   action: UserActionType
 ): any => {
   switch (action.type) {

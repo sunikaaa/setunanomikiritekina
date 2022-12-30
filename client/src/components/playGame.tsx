@@ -91,7 +91,7 @@ const PlayGame: React.FC<PlayGame> = ({ reload }) => {
         setTimeout(() => {
           setreMatch(true);
         }, 1000);
-      } else if (state.game.winner === 'drow') {
+      } else if (state.game.winner === 'draw') {
         //引き分け時の処理
         setmyCharacter({
           left: '50%',

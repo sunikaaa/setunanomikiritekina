@@ -3,6 +3,8 @@ import { NameContext } from './contexts/nameContext';
 import HomeGame from './components/homeGame';
 import WaitingGame from './components/waitingGame';
 import PlayGame from './components/playGame';
+import { normal, playing, waiting } from './actions/gamePage';
+
 
 const Game = () => {
   const { state } = useContext(NameContext);
@@ -11,11 +13,11 @@ const Game = () => {
 
 const switchMode = (word: string) => {
   switch (word) {
-    case 'nomal':
+    case normal:
       return <HomeGame />;
-    case 'waiting':
+    case waiting:
       return <WaitingGame />;
-    case 'playing':
+    case playing:
       return <PlayGame />;
     default:
       return <HomeGame />;

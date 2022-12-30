@@ -11,7 +11,7 @@ import {
   startGame,
   finishGame,
   requestMatch,
-  requestRecieve,
+  requestReceive,
   requestQuit,
   callUser,
   timeLagSet
