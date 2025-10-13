@@ -46,11 +46,11 @@ const PreLoad = () => {
   );
 };
 
-interface PlayGame {
+interface PlayGameProps {
   reload: () => void;
 }
 
-const PlayGame: React.FC<PlayGame> = ({ reload }) => {
+const PlayGame: React.FC<PlayGameProps> = ({ reload }) => {
   const { state, dispatch } = useContext(NameContext);
   const [bomState, setBomState] = useState(false);
   const [myCharacter, setmyCharacter] = useState<imageArea>({
@@ -212,11 +212,11 @@ const Fire = ({ time }: any) => {
   );
 };
 
-interface ModalDialog extends PlayGame {
+interface ModalDialogProps extends PlayGameProps {
   match: string;
 }
 
-const ModalDialog: React.FC<ModalDialog> = ({ match, reload }) => {
+const ModalDialog: React.FC<ModalDialogProps> = ({ match, reload }) => {
   const { state, dispatch } = useContext(NameContext);
   const reMatch = () => {
     reload();

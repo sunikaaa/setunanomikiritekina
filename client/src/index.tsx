@@ -6,7 +6,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { NameContext, NameInitialState } from './contexts/nameContext';
 import { WrapwsUser } from './plugins/socket';
-const MyApp: React.FC = ({ children }): any => {
+const MyApp: React.FC<React.PropsWithChildren> = ({ children }): any => {
   const [state, dispatch] = useReducer(reducer, NameInitialState);
   useEffect(() => {
     WrapwsUser({ state, dispatch });

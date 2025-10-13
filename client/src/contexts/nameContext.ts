@@ -18,7 +18,7 @@ export interface State {
 export const NameInitialState: State = {
   game: {
     loggedIn: false,
-    userState: normal,
+    gameWindowState: normal,
     pareState: [],
     room: '',
     time: 0,

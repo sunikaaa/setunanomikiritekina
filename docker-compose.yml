@@ -1,17 +1,16 @@
-version: '3.1'
 services:
   client:
     build:
       context: ./
       dockerfile: ./Dockerfile_client
-    command: bash -c "npm install  && yarn build"
+    command: bash -c "pnpm install && pnpm run build"
     working_dir: /app
     tty: true
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - HOST=0.0.0.0
-        # ports:
-        # - 3000:3000
+    # ports:
+    # - 3000:3000
     volumes:
       - ./client:/app
       - /app/node_modules
@@ -20,7 +19,7 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile_websocket
-    command: bash -c 'npm install && npm run dev'
+    command: bash -c 'pnpm install && pnpm run dev'
     working_dir: /app
     restart: always
     ports:

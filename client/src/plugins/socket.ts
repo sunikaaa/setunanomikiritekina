@@ -20,7 +20,13 @@ import Ws from 'socket.io-client';
 import { ContextState } from '../contexts/nameContext';
 import _ from 'lodash';
 
-export const wsUser = Ws("ws://133.130.101.109:3030");
+// 環境に応じてWebSocketのURLを設定
+// Docker環境（nginx経由）の場合は空文字（同じオリジン）、
+// ローカル開発の場合は直接3030に接続
+const WS_URL = process.env.REACT_APP_WS_URL || 
+  (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3030');
+
+export const wsUser = Ws(WS_URL);
 
 interface onlineUser {
   name: string;

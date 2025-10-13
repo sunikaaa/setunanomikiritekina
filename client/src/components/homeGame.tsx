@@ -3,7 +3,7 @@ import { NameContext } from '../contexts/nameContext';
 import '../css/main.scss';
 import '../css/homeGame.scss';
 import { gameStateChange, toHomeSetPure } from '../actions';
-import { requestMatch, matchUser } from '../actions/socket';
+import { requestMatch } from '../actions/socket';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
@@ -107,10 +107,10 @@ const HomeGame = () => {
   );
 };
 
-interface WaitingPlayer {
+interface WaitingPlayerProps {
   requestedUser: (socketId: string) => void;
 }
-const WaitingPlayer: React.FC<WaitingPlayer> = ({ requestedUser }) => {
+const WaitingPlayer: React.FC<WaitingPlayerProps> = ({ requestedUser }) => {
   const { state } = useContext(NameContext);
   return (
     <div className='waiting-box'>
@@ -128,7 +128,7 @@ const WaitingPlayer: React.FC<WaitingPlayer> = ({ requestedUser }) => {
   );
 };
 
-interface propsOnlinceUser extends WaitingPlayer {
+interface propsOnlinceUser extends WaitingPlayerProps {
   name: string;
   userState: string;
   socketId: string;
@@ -207,7 +207,7 @@ const RandomMatch = () => {
   );
 };
 
-const Modal: React.FC = ({ children }) => {
+const Modal: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <div>
       <div className='whFull modal-overlay2'></div>

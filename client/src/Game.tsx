@@ -8,7 +8,7 @@ import { normal, playing, waiting } from './actions/gamePage';
 
 const Game = () => {
   const { state } = useContext(NameContext);
-  return <>{switchMode(state.game.userState)}</>;
+  return <>{switchMode(state.game.gameWindowState)}</>;
 };
 
 const switchMode = (word: string) => {
