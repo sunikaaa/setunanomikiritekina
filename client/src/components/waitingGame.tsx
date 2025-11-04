@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { NameContext } from '../contexts/nameContext';
 import '../css/loading.scss';
 import '../css/main.scss';
+import '../css/waitingGame.scss';
 import _ from 'lodash';
 import { gameStateChange, rematch } from '../actions';
 import { wsToHome, wsUser } from '../plugins/socket';
@@ -10,12 +11,10 @@ const WaitingPare = () => {
     wsUser.emit('serchPare');
   }, []);
   return (
-    <div>
-      <div className='flex center'>
-        <div>
-          <WaitingCanvas />
-          対戦相手を待っています......
-        </div>
+    <div className='waiting-pare-container'>
+      <WaitingCanvas />
+      <div className='waiting-message'>
+        対戦相手を待っています......
       </div>
     </div>
   );
@@ -42,12 +41,12 @@ const WaitingGame = () => {
     // eslint-disable-next-line
   }, []);
   return (
-    <>
+    <div className='waiting-container'>
       {_.isEmpty(state.game.pareState) ? <WaitingPare /> : <SeePare />}
-      <div>
-        <button onClick={returnHome}>戻る</button>
+      <div className='waiting-button-container'>
+        <button className='return-button' onClick={returnHome}>戻る</button>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -60,20 +59,20 @@ const SeePare = () => {
 
   return (
     <>
-      <div className='flex around'>
-        <div className='flex column'>
-          <div>あなた</div>
-          <div>{state.user.name}</div>
+      <div className='player-info'>
+        <div className='player-box'>
+          <div className='player-label'>あなた</div>
+          <div className='player-name'>{state.user.name}</div>
         </div>
-        <div className='flex column'>
-          <div>あいて</div>
+        <div className='player-box'>
+          <div className='player-label'>あいて</div>
           {state.game.pareState.map((user, index) => (
-            <div key={index}>{user.name}</div>
+            <div className='player-name' key={index}>{user.name}</div>
           ))}
         </div>
       </div>
-      <div className='flex center'>
-        <button onClick={complete}>準備完了</button>
+      <div className='waiting-button-container'>
+        <button className='ready-button' onClick={complete}>準備完了</button>
       </div>
     </>
   );

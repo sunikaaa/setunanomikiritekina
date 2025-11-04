@@ -79,3 +79,78 @@
   transform: translateX(100%);
   transition: all 100ms ease-in;
 }
+
+.home-request {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.home-quit {
+  justify-content: center;
+  margin-top: 20px;
+}
+
+// モーダル内のボタンスタイル
+.modal-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  .button {
+    padding: 14px 36px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    min-width: 130px;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+    
+    &:active {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    &.red {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #ff5252 0%, #e63946 100%);
+      }
+      
+      &:active {
+        background: linear-gradient(135deg, #e63946 0%, #d62839 100%);
+      }
+    }
+    
+    &.blue {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
+      }
+      
+      &:active {
+        background: linear-gradient(135deg, #4a56bc 0%, #5d3580 100%);
+      }
+    }
+  }
+  
+  .around {
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}

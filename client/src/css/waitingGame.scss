@@ -1,0 +1,101 @@
+.waiting-container {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.waiting-message {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.waiting-pare-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+  flex-direction: column;
+}
+
+.player-info {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  .player-box {
+    text-align: center;
+    flex: 1;
+    
+    .player-label {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .player-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-top: 8px;
+    }
+  }
+}
+
+.waiting-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 20px;
+  
+  button {
+    padding: 14px 36px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 140px;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    &.return-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
+      }
+    }
+    
+    &.ready-button {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      
+      &:hover {
+        background: linear-gradient(135deg, #e080e9 0%, #e4455a 100%);
+      }
+    }
+  }
+}
+
