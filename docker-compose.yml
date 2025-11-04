@@ -1,25 +1,23 @@
 services:
   client:
     build:
-      context: ./
-      dockerfile: ./Dockerfile_client
+      context: ./client
+      dockerfile: ../Dockerfile_client
     command: pnpm run build
     working_dir: /app
     tty: true
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
-    # ports:
-    # - 3000:3000
     volumes:
       - ./client:/app
-      - /app/node_modules
-    entrypoint: bash -c "pnpm install && exec pnpm run build"
+      - client_node_modules:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store
 
   websocket:
     build:
-      context: ./
-      dockerfile: ./Dockerfile_websocket
+      context: ./websocket
+      dockerfile: ../Dockerfile_websocket
     command: pnpm run dev
     working_dir: /app
     restart: always
@@ -27,13 +25,18 @@ services:
       - 3030:3030
     volumes:
       - ./websocket:/app
-      - /app/node_modules
-    entrypoint: bash -c "pnpm install && exec pnpm run dev"
+      - websocket_node_modules:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store
   nginx:
     image: nginx
     restart: always
     ports:
-            - 80:80
+      - 80:80
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./client/build:/var/www
+
+volumes:
+  client_node_modules:
+  websocket_node_modules:
+  pnpm_store:
